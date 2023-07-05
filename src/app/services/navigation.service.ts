@@ -50,6 +50,13 @@ export class NavigationService {
     },
     {
       type: 'link',
+      id: 'tasks',
+      display: $localize`Tasks`,
+      icon: 'adjust',
+      route: '/tasks',
+    },
+    {
+      type: 'link',
       id: 'results',
       display: $localize`Results`,
       icon: 'workspace_premium',
@@ -80,6 +87,7 @@ export class NavigationService {
     'partitions',
     'divider',
     'sessions',
+    'tasks',
     'results',
     'divider',
     'settings',

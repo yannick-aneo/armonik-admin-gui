@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
-import { TasksStatusesService } from '@app/tasks/services/task-status.service';
+import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { TaskStatusColored, ViewTasksByStatusDialogData } from '@app/types/dialog';
 
 @Component({

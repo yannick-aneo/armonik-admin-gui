@@ -102,7 +102,7 @@ import { ResultRaw, ResultRawColumnKey, ResultRawFieldKey, ResultRawFilter, Resu
           <mat-menu #menu="matMenu">
             <a mat-menu-item [routerLink]="['/results', element.resultId]">
               <mat-icon aria-hidden="true" fontIcon="visibility"></mat-icon>
-              <span i18n> See results </span>
+              <span i18n> See result </span>
             </a>
           </mat-menu>
         </td>

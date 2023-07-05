@@ -1,6 +1,6 @@
 import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { Injectable, inject } from '@angular/core';
-import { TasksStatusesService } from '@app/tasks/services/task-status.service';
+import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { DashboardStorageService } from './dashboard-storage.service';
 import { TasksStatusesGroup } from '../types';
 

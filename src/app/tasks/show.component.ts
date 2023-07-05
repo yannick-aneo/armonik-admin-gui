@@ -4,67 +4,71 @@ import { ActivatedRoute } from '@angular/router';
 import { map, switchMap } from 'rxjs';
 import { AppShowComponent } from '@app/types/components';
 import { ShowPageComponent } from '@components/show-page.component';
+import { IconsService } from '@services/icons.service';
 import { QueryParamsService } from '@services/query-params.service';
 import { ShareUrlService } from '@services/share-url.service';
 import { UtilsService } from '@services/utils.service';
-import { SessionsGrpcService } from './services/sessions-grpc.service';
-import { SessionsStatusesService } from './services/sessions-statuses.service';
-import { SessionRaw } from './types';
+import { TasksGrpcService } from './services/tasks-grpc.service';
+import { TasksStatusesService } from './services/tasks-status.service';
+import { TaskRaw } from './types';
 
 @Component({
-  selector: 'app-sessions-show',
+  selector: 'app-tasks-show',
   template: `
 <app-show-page [id]="data?.sessionId ?? null" [data]="data" [sharableURL]="sharableURL" [statuses]="statuses">
-  <!-- TODO: use service icon -->
-  <mat-icon matListItemIcon aria-hidden="true" fontIcon="workspaces"></mat-icon>
-  <span i18n="Page title"> Session </span>
+  <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="taskIcon"></mat-icon>
+  <span i18n="Page title"> Task </span>
 </app-show-page>
   `,
   styles: [`
   `],
   standalone: true,
   providers: [
+    IconsService,
     UtilsService,
     ShareUrlService,
     QueryParamsService,
-    SessionsGrpcService,
-    SessionsStatusesService,
+    TasksGrpcService,
+    TasksStatusesService,
   ],
   imports: [
     ShowPageComponent,
     MatIconModule,
   ]
 })
-export class ShowComponent implements AppShowComponent<SessionRaw>, OnInit, AfterViewInit {
+export class ShowComponent implements AppShowComponent<TaskRaw>, OnInit, AfterViewInit {
   sharableURL = '';
-  data: SessionRaw | null = null;
+  data: TaskRaw | null = null;
 
   #shareURLService = inject(ShareUrlService);
-  #sessionsStatusesService = inject(SessionsStatusesService);
+  #route = inject(ActivatedRoute);
+  #tasksGrpcService = inject(TasksGrpcService);
+  #tasksStatusesService = inject(TasksStatusesService);
+  #iconsService = inject(IconsService);
 
-  constructor(
-    private _route: ActivatedRoute,
-    private _sessionsGrpcService: SessionsGrpcService,
-  ) {}
 
   ngOnInit(): void {
     this.sharableURL = this.#shareURLService.generateSharableURL(null, null);
   }
 
   ngAfterViewInit(): void {
-    this._route.params.pipe(
+    this.#route.params.pipe(
       map(params => params['id']),
       switchMap((id) => {
-        return this._sessionsGrpcService.get$(id);
+        return this.#tasksGrpcService.get$(id);
       }),
       map((data) => {
-        return data.session ?? null;
+        return data.task ?? null;
       })
     )
       .subscribe((data) => this.data = data);
   }
 
   get statuses() {
-    return this.#sessionsStatusesService.statuses;
+    return this.#tasksStatusesService.statuses;
+  }
+
+  get taskIcon() {
+    return this.#iconsService.getPageIcon('tasks');
   }
 }

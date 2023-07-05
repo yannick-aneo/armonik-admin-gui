@@ -1,6 +1,7 @@
 import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { Injectable } from '@angular/core';
 
+// TODO: rename this file with a S at task
 @Injectable()
 export class TasksStatusesService {
   readonly statuses: Record<TaskStatus, string> = {

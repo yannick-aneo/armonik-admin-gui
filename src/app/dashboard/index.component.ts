@@ -8,8 +8,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
-import { TaskGrpcService } from '@app/tasks/services/task-grpc.service';
-import { TasksStatusesService } from '@app/tasks/services/task-status.service';
+import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
+import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount } from '@app/tasks/types';
 import { ActionsToolbarGroupComponent } from '@components/actions-toolbar-group.component';
 import { ActionsToolbarComponent } from '@components/actions-toolbar.component';
@@ -94,7 +94,7 @@ app-actions-toolbar {
     TasksStatusesService,
     ShareUrlService,
     QueryParamsService,
-    TaskGrpcService,
+    TasksGrpcService,
     StorageService,
     DashboardStorageService,
     DashboardIndexService,
@@ -142,7 +142,7 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private _dialog: MatDialog,
     private _shareURLService: ShareUrlService,
-    private _taskGrpcService: TaskGrpcService,
+    private _taskGrpcService: TasksGrpcService,
     private _dashboardIndexService: DashboardIndexService,
     private _autoRefreshService: AutoRefreshService
   ) {}

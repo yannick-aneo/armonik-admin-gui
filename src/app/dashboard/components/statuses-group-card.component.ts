@@ -2,7 +2,7 @@ import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { NgFor, NgIf } from '@angular/common';
 import { Component, Input, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { TasksStatusesService } from '@app/tasks/services/task-status.service';
+import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount } from '@app/tasks/types';
 import { TasksStatusesGroup } from '../types';
 
