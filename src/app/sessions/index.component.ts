@@ -135,7 +135,7 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
       </ng-container>
       <!-- Session's Tasks Count by Status -->
       <ng-container *ngIf="isCountColumn(column)">
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" appNoWrap>
           <app-sessions-count-by-status
             [statuses]="tasksStatusesColored"
             [sessionId]="element.sessionId"
@@ -144,7 +144,6 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
       </ng-container>
       <!-- Actions -->
       <ng-container *ngIf="isActionsColumn(column)">
-        <!-- TODO: create a directive to add no-wrap -->
         <td mat-cell *matCellDef="let element">
           <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Actions">
             <mat-icon>more_vert</mat-icon>
@@ -154,9 +153,18 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
               <mat-icon aria-hidden="true" fontIcon="content_copy"></mat-icon>
               <span i18n>Copy Session ID</span>
             </button>
+            <!-- TODO: use icons service -->
             <a mat-menu-item [routerLink]="['/sessions', element.sessionId]">
               <mat-icon aria-hidden="true" fontIcon="visibility"></mat-icon>
               <span i18n>See session</span>
+            </a>
+            <a mat-menu-item [routerLink]="['/tasks']" [queryParams]="{ sessionId: element.sessionId }">
+              <mat-icon aria-hidden="true" fontIcon="adjust"></mat-icon>
+              <span i18n>See tasks</span>
+            </a>
+            <a mat-menu-item [routerLink]="['/results']" [queryParams]="{ sessionId: element.sessionId }">
+              <mat-icon aria-hidden="true" fontIcon="workspace_premium"></mat-icon>
+              <span i18n>See results</span>
             </a>
             <button mat-menu-item (click)="onCancel(element.sessionId)">
               <mat-icon aria-hidden="true" fontIcon="cancel"></mat-icon>
@@ -459,11 +467,13 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filters = filters as SessionRawFilter[];
 
     this._sessionsIndexService.saveFilters(filters as SessionRawFilter[]);
+    this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 
   onFiltersReset() {
     this.filters = this._sessionsIndexService.resetFilters();
+    this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 

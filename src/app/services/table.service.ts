@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { FieldKey } from '@app/types/data';
+import { Filter, FilterField } from '@app/types/filters';
 import { ListOptions } from '@app/types/options';
 import { StorageService } from './storage.service';
 import { TableStorageService } from './table-storage.service';
@@ -93,17 +94,19 @@ export class TableService {
   /**
    * Restore filters from the URL and then from the storage
    */
-  restoreFilters<T>(tableName:string): T | null {
-    const storageKey = this._storageService.buildKey(tableName, this._filtersKey);
+  // TODO: Fix types
+  restoreFilters<T extends object>(tableName: string, availableFiltersFields: FilterField<T>[]): Filter<T>[] | null {
 
-    const queryParams = this._tableURLService.getQueryParams<T>(this._filtersKey) as T;
+    const queryParams = this._tableURLService.getQueryParamsFilters<T>(availableFiltersFields);
 
-    if (queryParams) {
+    if (queryParams.length) {
       this.saveFilters(tableName, queryParams);
       return queryParams;
     }
 
-    const storageData = this._tableStorageService.restore<T>(storageKey) as T;
+
+    const storageKey = this._storageService.buildKey(tableName, this._filtersKey);
+    const storageData = this._tableStorageService.restore<Filter<T>>(storageKey) as Filter<T>[] | null;
 
     return storageData;
   }

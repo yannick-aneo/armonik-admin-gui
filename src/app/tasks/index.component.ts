@@ -1,4 +1,5 @@
 import { TaskOptions, TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
@@ -84,7 +85,7 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
           <a mat-button
             [routerLink]="['/results']"
             [queryParams]="{
-              taskId: element[column],
+              ownerTaskId: element[column],
             }"
           >
             {{ element[column] }}
@@ -125,6 +126,10 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
+            <button mat-menu-item [cdkCopyToClipboard]="element.id" (cdkCopyToClipboardCopied)="onCopiedTaskId()">
+              <mat-icon aria-hidden="true" fontIcon="content_copy"></mat-icon>
+              <span i18n>Copy Task ID</span>
+            </button>
            <a mat-menu-item [routerLink]="['/tasks', element.id]">
               <mat-icon aria-hidden="true" fontIcon="visibility"></mat-icon>
               <span i18n> See task </span>
@@ -176,6 +181,7 @@ app-table-actions-toolbar {
     MatTableModule,
     MatSortModule,
     DragDropModule,
+    ClipboardModule,
   ],
   providers: [
     TasksGrpcService,
@@ -384,11 +390,13 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filters = value as TaskSummaryFilter[];
 
     this.#tasksIndexService.saveFilters(this.filters);
+    this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 
   onFiltersReset(): void{
     this.filters = this.#tasksIndexService.resetFilters();
+    this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 
@@ -432,6 +440,10 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     moveItemInArray(this.displayedColumns, event.previousIndex, event.currentIndex);
 
     this.#tasksIndexService.saveColumns(this.displayedColumns);
+  }
+
+  onCopiedTaskId() {
+    this.#notificationService.success('Task ID copied to clipboard');
   }
 
   trackByColumn(index: number, item: TaskSummaryColumnKey): string {

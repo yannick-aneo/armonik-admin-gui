@@ -129,8 +129,7 @@ export class ApplicationsIndexService {
   }
 
   restoreFilters(): ApplicationRawFilter[] {
-    // TODO: rework filters
-    return this.#tableService.restoreFilters<ApplicationRawFilter[]>(this.tableName) ?? this.defaultFilters;
+    return this.#tableService.restoreFilters<ApplicationRaw>(this.tableName, this.availableFiltersFields) ?? this.defaultFilters;
   }
 
   resetFilters(): ApplicationRawFilter[] {

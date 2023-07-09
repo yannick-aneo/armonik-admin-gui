@@ -81,6 +81,19 @@ import { ResultRaw, ResultRawColumnKey, ResultRawFieldKey, ResultRawFilter, Resu
           {{ element[column] | emptyCell }}
         </td>
       </ng-container>
+      <!-- Session ID -->
+      <ng-container *ngIf="isSessionIdColumn(column)">
+        <td mat-cell *matCellDef="let element" appNoWrap>
+          <a mat-button
+            [routerLink]="['/sessions']"
+            [queryParams]="{
+              sessionId: element[column],
+            }"
+          >
+            {{ element[column] }}
+          </a>
+        </td>
+      </ng-container>
       <!-- Date -->
       <ng-container *ngIf="isDateColumn(column)">
         <td mat-cell *matCellDef="let element" appNoWrap>
@@ -290,6 +303,10 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy, AppInde
     return this._iconsService.getPageIcon(name);
   }
 
+  isSessionIdColumn(column: ResultRawColumnKey): boolean {
+    return this._resultsIndexService.isSessionIdColumn(column);
+  }
+
   isActionsColumn(column: ResultRawColumnKey): boolean {
     return this._resultsIndexService.isActionsColumn(column);
   }
@@ -341,11 +358,13 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy, AppInde
     this.filters = value as ResultRawFilter[];
 
     this._resultsIndexService.saveFilters(value as ResultRawFilter[]);
+    this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 
   onFiltersReset(): void {
     this.filters = this._resultsIndexService.resetFilters();
+    this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 

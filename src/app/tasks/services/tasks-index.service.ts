@@ -165,7 +165,8 @@ export class TasksIndexService {
   }
 
   restoreFilters(): TaskSummaryFilter[] {
-    return this.#tableService.restoreFilters<TaskSummaryFilter[]>(this.tableName) ?? this.defaultFilters;
+    // return this.#tableService.restoreFilters<TaskSummaryFilter[]>(this.tableName) ?? this.defaultFilters;
+    return this.defaultFilters;
   }
 
   resetFilters(): TaskSummaryFilter[] {

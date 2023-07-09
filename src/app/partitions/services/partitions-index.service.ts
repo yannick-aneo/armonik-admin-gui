@@ -34,6 +34,7 @@ export class PartitionsIndexService implements AppIndexService<PartitionRaw> {
 
   readonly defaultFilters: PartitionRawFilter[] = [];
   readonly availableFiltersFields: PartitionRawFilterField[] = [
+    // Do not add filter on array or object fields
     {
       field: 'id',
       type: 'text',
@@ -41,14 +42,6 @@ export class PartitionsIndexService implements AppIndexService<PartitionRaw> {
     {
       field: 'priority',
       type: 'number',
-    },
-    {
-      field: 'parentPartitionIds',
-      type: 'text',
-    },
-    {
-      field: 'podConfiguration',
-      type: 'text',
     },
     {
       field: 'podMax',
@@ -148,7 +141,7 @@ export class PartitionsIndexService implements AppIndexService<PartitionRaw> {
   }
 
   restoreFilters(): PartitionRawFilter[] {
-    return this.#tableService.restoreFilters<PartitionRawFilter[]>(this.tableName) ?? this.defaultFilters;
+    return this.#tableService.restoreFilters<PartitionRaw>(this.tableName, this.availableFiltersFields) ?? this.defaultFilters;
   }
 
   resetFilters(): PartitionRawFilter[] {
