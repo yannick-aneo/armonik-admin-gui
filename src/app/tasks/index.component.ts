@@ -1,9 +1,11 @@
 import { TaskOptions, TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { SelectionModel } from '@angular/cdk/collections';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -58,6 +60,12 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
       (displayedColumnsChange)="onColumnsChange($event)"
       (resetColumns)="onColumnsReset()"
       (resetFilters)="onFiltersReset()">
+        <ng-container extra-buttons-right>
+          <button mat-flat-button color="accent" (click)="onCancelTasksSelection()" [disabled]="!selection.selected.length">
+            <mat-icon matListIcon aria-hidden="true" fontIcon="stop"></mat-icon>
+            <span i18n> Cancel Tasks </span>
+          </button>
+        </ng-container>
     </app-table-actions-toolbar>
   </mat-toolbar-row>
 
@@ -70,9 +78,33 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
   <table mat-table matSort [matSortActive]="options.sort.active" matSortDisableClear [matSortDirection]="options.sort.direction" [dataSource]="data" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="onDrop($event)">
 
     <ng-container *ngFor="let column of displayedColumns; trackBy:trackByColumn" [matColumnDef]="column">
-      <th mat-header-cell mat-sort-header [disabled]="isNotSortableColumn(column)" *matHeaderCellDef cdkDrag appNoWrap>
-        {{ columnToLabel(column) }}
-      </th>
+      <!-- Header -->
+      <ng-container *ngIf="!isSelectColumn(column)">
+        <th mat-header-cell mat-sort-header [disabled]="isNotSortableColumn(column)" *matHeaderCellDef cdkDrag appNoWrap>
+          {{ columnToLabel(column) }}
+        </th>
+      </ng-container>
+      <!-- Header for selection -->
+      <ng-container *ngIf="isSelectColumn(column)">
+        <th mat-header-cell *matHeaderCellDef cdkDrag appNoWrap>
+          <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                        [aria-label]="checkboxLabel()">
+          </mat-checkbox>
+        </th>
+      </ng-container>
+
+      <!-- Selection -->
+      <ng-container *ngIf="isSelectColumn(column)">
+       <td mat-cell *matCellDef="let element" appNoWrap>
+           <mat-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(element) : null"
+                    [checked]="selection.isSelected(element)"
+                    [aria-label]="checkboxLabel(element)">
+            </mat-checkbox>
+        </td>
+      </ng-container>
       <!-- Columns -->
       <ng-container *ngIf="isSimpleColumn(column)">
         <td mat-cell *matCellDef="let element" appNoWrap>
@@ -134,6 +166,10 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
               <mat-icon aria-hidden="true" fontIcon="visibility"></mat-icon>
               <span i18n> See task </span>
             </a>
+            <button mat-menu-item (click)="onCancelTask(element.id)">
+              <mat-icon aria-hidden="true" fontIcon="cancel"></mat-icon>
+              <span i18n> Cancel task </span>
+            </button>
             </mat-menu>
           </td>
       </ng-container>
@@ -179,6 +215,7 @@ app-table-actions-toolbar {
     MatIconModule,
     MatSnackBarModule,
     MatTableModule,
+    MatCheckboxModule,
     MatSortModule,
     DragDropModule,
     ClipboardModule,
@@ -207,6 +244,8 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
 
   displayedColumns: TaskSummaryColumnKey[] = [];
   availableColumns: TaskSummaryColumnKey[] = [];
+
+  selection = new SelectionModel<TaskSummary>(true, []);
 
   isLoading = true;
   data: TaskSummary[] = [];
@@ -351,6 +390,10 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.#tasksIndexService.isObjectColumn(column);
   }
 
+  isSelectColumn(column: TaskSummaryColumnKey): boolean {
+    return this.#tasksIndexService.isSelectColumn(column);
+  }
+
   isSimpleColumn(column: TaskSummaryColumnKey): boolean {
     return this.#tasksIndexService.isSimpleColumn(column);
   }
@@ -400,6 +443,28 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     this.refresh.next();
   }
 
+  onCancelTask(taskId: string): void {
+    this.cancelTasks([taskId]);
+  }
+
+  onCancelTasksSelection():void {
+    const tasksIds = this.selection.selected.map((task) => task.id);
+    this.cancelTasks(tasksIds);
+  }
+
+  cancelTasks(tasksIds: string[]): void {
+    this.#tasksGrpcService.cancel$(tasksIds).subscribe({
+      complete: () => {
+        this.#notificationService.success('Tasks canceled');
+        this.refresh.next();
+      },
+      error: (error) => {
+        console.error(error);
+        this.#notificationService.error('Unable to cancel tasks');
+      },
+    });
+  }
+
   columnsLabels(): Record<TaskSummaryColumnKey, string> {
     return this.#tasksIndexService.columnsLabels;
   }
@@ -444,6 +509,31 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onCopiedTaskId() {
     this.#notificationService.success('Task ID copied to clipboard');
+  }
+
+  isAllSelected(): boolean {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.data.length;
+
+    return numSelected === numRows;
+  }
+
+  toggleAllRows(): void {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.selection.select(...this.data);
+  }
+
+  checkboxLabel(row?: TaskSummary): string {
+    if (!row) {
+      return $localize`${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+
+    if (this.selection.isSelected(row)) {
+      return $localize`Deselect Task ${row.id}`;
+    }
+
+    return $localize`Select Task ${row.id}`;
   }
 
   trackByColumn(index: number, item: TaskSummaryColumnKey): string {

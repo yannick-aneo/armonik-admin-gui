@@ -1,18 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { TableService } from '@services/table.service';
-import { TasksStatusesService } from './tasks-status.service';
 import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFilter, TaskSummaryFilterField, TaskSummaryListOptions } from '../types';
 
 @Injectable()
 export class TasksIndexService {
-  #tasksStatusesService = inject(TasksStatusesService);
   #tableService = inject(TableService);
 
   readonly tableName: string = 'tasks';
 
   readonly defaultColumns: TaskSummaryColumnKey[] = ['id', 'status', 'submittedAt', 'actions'];
   readonly availableColumns: TaskSummaryColumnKey[] = [
-    'id', 'acquiredAt', 'actions', 'createdAt', 'creationToEndDuration', 'endedAt', 'initialTaskId', 'options', 'options.applicationName', 'options.applicationNamespace', 'options.applicationService', 'options.applicationVersion', 'options.engineType', 'options.maxDuration', 'options.maxRetries', 'options.partitionId', 'options.priority', 'ownerPodId', 'podHostname', 'podTtl', 'processingToEndDuration', 'receivedAt', 'sessionId', 'startedAt', 'status', 'statusMessage', 'submittedAt', 'countDataDependencies', 'countExpectedOutputIds', 'countParentTaskIds', 'countRetryOfIds'
+    'id', 'acquiredAt', 'actions', 'createdAt', 'creationToEndDuration', 'endedAt', 'initialTaskId', 'options', 'options.applicationName', 'options.applicationNamespace', 'options.applicationService', 'options.applicationVersion', 'options.engineType', 'options.maxDuration', 'options.maxRetries', 'options.partitionId', 'options.priority', 'ownerPodId', 'podHostname', 'podTtl', 'processingToEndDuration', 'receivedAt', 'sessionId', 'startedAt', 'status', 'statusMessage', 'submittedAt', 'countDataDependencies', 'countExpectedOutputIds', 'countParentTaskIds', 'countRetryOfIds', 'select'
   ];
 
   readonly dateColumns: TaskSummaryColumnKey[] = ['acquiredAt', 'createdAt', 'endedAt', 'receivedAt', 'startedAt', 'submittedAt'];
@@ -53,6 +51,7 @@ export class TasksIndexService {
     countParentTaskIds: $localize`Count Parent Task IDs`,
     countRetryOfIds: $localize`Count Retry Of IDs`,
     error: $localize`Error`,
+    select: $localize`Select`,
   };
 
   readonly defaultOptions: TaskSummaryListOptions = {
@@ -102,12 +101,16 @@ export class TasksIndexService {
     return this.objectColumns.includes(column);
   }
 
+  isSelectColumn(column: TaskSummaryColumnKey): boolean {
+    return column === 'select';
+  }
+
   isSimpleColumn(column: TaskSummaryColumnKey): boolean {
-    return !this.isDateColumn(column) && !this.isDurationColumn(column) && !this.isObjectColumn(column) && !this.isStatusColumn(column) && !this.isTaskIdColumn(column) && !this.isActionsColumn(column);
+    return !this.isDateColumn(column) && !this.isDurationColumn(column) && !this.isObjectColumn(column) && !this.isStatusColumn(column) && !this.isTaskIdColumn(column) && !this.isActionsColumn(column) && !this.isSelectColumn(column);
   }
 
   isNotSortableColumn(column: TaskSummaryColumnKey): boolean {
-    return this.isActionsColumn(column) || this.isObjectColumn(column);
+    return this.isActionsColumn(column) || this.isObjectColumn(column) || this.isSelectColumn(column);
   }
 
   /**
