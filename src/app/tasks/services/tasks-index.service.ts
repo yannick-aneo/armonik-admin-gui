@@ -1,9 +1,12 @@
+import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { Injectable, inject } from '@angular/core';
 import { TableService } from '@services/table.service';
+import { TasksStatusesService } from './tasks-status.service';
 import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFilter, TaskSummaryFilterField, TaskSummaryListOptions } from '../types';
 
 @Injectable()
 export class TasksIndexService {
+  #tasksStatusesService = inject(TasksStatusesService);
   #tableService = inject(TableService);
 
   readonly tableName: string = 'tasks';
@@ -65,7 +68,26 @@ export class TasksIndexService {
 
   readonly defaultFilters: TaskSummaryFilter[] = [];
   readonly availableFiltersFields: TaskSummaryFilterField[] = [
-    // TODO: add filters
+    // Do not filter object or array fields
+    // {
+    //   field: 'id',
+    //   type: 'text',
+    // },
+    {
+      field: 'status',
+      type: 'select',
+      options: Object.keys(this.#tasksStatusesService.statuses).map(status => {
+        return {
+          value: status,
+          label: this.#tasksStatusesService.statuses[Number(status) as TaskStatus],
+        };
+      }),
+    },
+    {
+      field: 'sessionId',
+      type: 'text',
+    },
+
   ];
 
   readonly defaultIntervalValue: number = 10;
@@ -168,8 +190,7 @@ export class TasksIndexService {
   }
 
   restoreFilters(): TaskSummaryFilter[] {
-    // return this.#tableService.restoreFilters<TaskSummaryFilter[]>(this.tableName) ?? this.defaultFilters;
-    return this.defaultFilters;
+    return this.#tableService.restoreFilters<TaskSummary>(this.tableName, this.availableFiltersFields) ?? this.defaultFilters;
   }
 
   resetFilters(): TaskSummaryFilter[] {

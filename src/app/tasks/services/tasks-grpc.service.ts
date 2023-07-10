@@ -1,11 +1,13 @@
-import { SortDirection as ArmoniKSortDirection, CancelTasksRequest, CancelTasksResponse, CountTasksByStatusRequest, CountTasksByStatusResponse, GetTaskRequest, GetTaskResponse, ListTasksRequest, ListTasksResponse, TaskStatus, TaskSummaryField, TasksClient } from '@aneoconsultingfr/armonik.api.angular';
+import { SortDirection as ArmoniKSortDirection, CancelTasksRequest, CancelTasksResponse, CountTasksByStatusRequest, CountTasksByStatusResponse, GetTaskRequest, GetTaskResponse, ListTasksRequest, ListTasksResponse, TaskStatus, TaskSummary, TaskSummaryField, TasksClient } from '@aneoconsultingfr/armonik.api.angular';
 import { Injectable, inject } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
 import { Observable } from 'rxjs';
+import { UtilsService } from '@services/utils.service';
 import { TaskSummaryFieldKey, TaskSummaryFilter, TaskSummaryListOptions } from '../types';
 
 @Injectable()
 export class TasksGrpcService {
+  readonly #utilsService = inject(UtilsService<TaskSummary>);
   readonly #tasksClient = inject(TasksClient);
 
   readonly sortDirections: Record<SortDirection, ArmoniKSortDirection> = {
@@ -40,6 +42,10 @@ export class TasksGrpcService {
   };
 
   list$(options: TaskSummaryListOptions, filters: TaskSummaryFilter[]): Observable<ListTasksResponse> {
+    const findFilter = this.#utilsService.findFilter;
+
+    const status = this.#utilsService.convertFilterValueToStatus<TaskStatus>(findFilter(filters, 'status'));
+
     const listTasksRequest = new ListTasksRequest({
       page: options.pageIndex,
       pageSize: options.pageSize,
@@ -51,8 +57,8 @@ export class TasksGrpcService {
         }
       },
       filter: {
-        sessionId: '',
-        status: [],
+        sessionId: this.#utilsService.convertFilterValue(findFilter(filters, 'sessionId')),
+        status:  status ? [status] : [],
       }
     });
 

@@ -33,6 +33,7 @@ import { ShareUrlService } from '@services/share-url.service';
 import { TableStorageService } from '@services/table-storage.service';
 import { TableURLService } from '@services/table-url.service';
 import { TableService } from '@services/table.service';
+import { UtilsService } from '@services/utils.service';
 import { TasksGrpcService } from './services/tasks-grpc.service';
 import { TasksIndexService } from './services/tasks-index.service';
 import { TasksStatusesService } from './services/tasks-status.service';
@@ -231,6 +232,7 @@ app-table-actions-toolbar {
     AutoRefreshService,
     ShareUrlService,
     QueryParamsService,
+    UtilsService,
   ],
 })
 export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
