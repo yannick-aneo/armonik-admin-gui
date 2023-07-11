@@ -4,13 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { IconsService } from '@services/icons.service';
 import { StorageService } from '@services/storage.service';
 
 @Component({
   selector: 'app-theme-selector',
   template: `
 <button mat-button class="theme" [matMenuTriggerFor]="themeMenu" i18n-aria-label aria-label="Choose a theme" matTooltip="Select a theme">
-  <mat-icon matListItemIcon aria-hidden="true" fontIcon="format_color_fill"></mat-icon>
+  <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="getIcon('format-color-fill')"></mat-icon>
 </button>
 <mat-menu #themeMenu="matMenu">
   <button mat-menu-item *ngFor="let theme of availableThemes" (click)="updateTheme(theme.name)">
@@ -47,6 +48,7 @@ import { StorageService } from '@services/storage.service';
 })
 export class ThemeSelectorComponent implements OnInit {
   #storageService = inject(StorageService);
+  #iconsService = inject(IconsService);
 
   #themeStorageKey = 'theme';
 
@@ -65,6 +67,10 @@ export class ThemeSelectorComponent implements OnInit {
       this.currentTheme = theme;
       this.#addTheme(theme);
     }
+  }
+
+  getIcon(iconName: string) {
+    return this.#iconsService.getIcon(iconName);
   }
 
   updateTheme(themeName: string) {
@@ -98,6 +104,9 @@ export class ThemeSelectorComponent implements OnInit {
     }
 
     themeElement.remove();
+
+    const body = document.getElementsByTagName('body')[0];
+    body.classList.remove(theme.name);
   }
 
   #addTheme(themeName: string) {
@@ -115,5 +124,8 @@ export class ThemeSelectorComponent implements OnInit {
     themeElement.href = `${theme.name}.css`;
 
     head.appendChild(themeElement);
+
+    const body = document.getElementsByTagName('body')[0];
+    body.classList.add(theme.name);
   }
 }

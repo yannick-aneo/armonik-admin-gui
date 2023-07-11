@@ -49,7 +49,7 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
   selector: 'app-sessions-index',
   template: `
 <app-page-header [sharableURL]="sharableURL">
-  <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="getIcon('sessions')"></mat-icon>
+  <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="getPageIcon('sessions')"></mat-icon>
   <span i18n="Page title"> Sessions </span>
 </app-page-header>
 
@@ -69,7 +69,12 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
       (resetFilters)="onFiltersReset()"
     >
       <ng-container extra-menu-items>
-        <button mat-menu-item (click)="personalizeTasksByStatus()" i18n>Personalize Tasks By Status</button>
+        <button mat-menu-item (click)="personalizeTasksByStatus()">
+          <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
+          <span i18n appNoWrap>
+            Personalize Tasks Status
+          </span>
+      </button>
       </ng-container>
     </app-table-actions-toolbar>
   </mat-toolbar-row>
@@ -146,16 +151,16 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
       <ng-container *ngIf="isActionsColumn(column)">
         <td mat-cell *matCellDef="let element">
           <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Actions">
-            <mat-icon>more_vert</mat-icon>
+            <mat-icon [fontIcon]="getIcon('more')"></mat-icon>
           </button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item [cdkCopyToClipboard]="element.sessionId" (cdkCopyToClipboardCopied)="onCopiedSessionId()">
-              <mat-icon aria-hidden="true" fontIcon="content_copy"></mat-icon>
+              <mat-icon aria-hidden="true" [fontIcon]="getIcon('copy')"></mat-icon>
               <span i18n>Copy Session ID</span>
             </button>
             <!-- TODO: use icons service -->
             <a mat-menu-item [routerLink]="['/sessions', element.sessionId]">
-              <mat-icon aria-hidden="true" fontIcon="visibility"></mat-icon>
+              <mat-icon aria-hidden="true" [fontIcon]="getIcon('view')"></mat-icon>
               <span i18n>See session</span>
             </a>
             <a mat-menu-item [routerLink]="['/tasks']" [queryParams]="{ sessionId: element.sessionId }">
@@ -167,7 +172,7 @@ import { SessionRaw, SessionRawColumnKey, SessionRawFieldKey, SessionRawFilter, 
               <span i18n>See results</span>
             </a>
             <button mat-menu-item (click)="onCancel(element.sessionId)">
-              <mat-icon aria-hidden="true" fontIcon="cancel"></mat-icon>
+              <mat-icon aria-hidden="true" [fontIcon]="getIcon('cancel')"></mat-icon>
               <span i18n>Cancel session</span>
             </button>
           </mat-menu>
@@ -432,7 +437,11 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     return this._sessionsStatusesService.statusToLabel(status);
   }
 
-  getIcon(name: Page): string {
+  getIcon(name: string): string {
+    return this._iconsService.getIcon(name);
+  }
+
+  getPageIcon(name: Page): string {
     return this._iconsService.getPageIcon(name);
   }
 
