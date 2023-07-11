@@ -25,6 +25,7 @@ import { IconsService } from '@services/icons.service';
 import { QueryParamsService } from '@services/query-params.service';
 import { ShareUrlService } from '@services/share-url.service';
 import { StorageService } from '@services/storage.service';
+import { UtilsService } from '@services/utils.service';
 import { ManageGroupsDialogComponent } from './components/manage-groups-dialog.component';
 import { StatusesGroupCardComponent } from './components/statuses-group-card.component';
 import { DashboardIndexService } from './services/dashboard-index.service';
@@ -111,6 +112,7 @@ app-actions-toolbar {
     DashboardStorageService,
     DashboardIndexService,
     AutoRefreshService,
+    UtilsService,
   ],
   imports: [
     NgFor,
