@@ -58,6 +58,7 @@ export class TasksGrpcService {
       },
       filter: {
         sessionId: this.#utilsService.convertFilterValue(findFilter(filters, 'sessionId')),
+        // initialTaskId: this.#utilsService.convertFilterValue(findFilter(filters, 'initialTaskId')),
         status:  status ? [status] : [],
       }
     });

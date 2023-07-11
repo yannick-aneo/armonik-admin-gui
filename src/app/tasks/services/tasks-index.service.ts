@@ -87,7 +87,11 @@ export class TasksIndexService {
       field: 'sessionId',
       type: 'text',
     },
-
+    // Need to add this filter to the API
+    {
+      field: 'initialTaskId',
+      type: 'text',
+    }
   ];
 
   readonly defaultIntervalValue: number = 10;

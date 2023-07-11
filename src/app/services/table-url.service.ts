@@ -32,8 +32,13 @@ export class TableURLService {
           break;
         case 'date':
           throw new Error('Not implemented');
-        case 'select':
-          throw new Error('Not implemented');
+        case 'select': {
+          const isFound = filter.options.some(option => option.value === value);
+          if (isFound) {
+            params.push({ field: key, value });
+          }
+          break;
+        }
         default:
           this.#unreachable(filter);
         }

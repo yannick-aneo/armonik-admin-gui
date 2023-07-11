@@ -154,6 +154,7 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
       </ng-container>
       <!-- Actions -->
       <ng-container *ngIf="isActionsColumn(column)">
+        <!-- TODO: use icons service -->
         <td mat-cell *matCellDef="let element" appNoWrap>
           <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more" i18n-aria-label>
             <mat-icon>more_vert</mat-icon>
@@ -163,10 +164,14 @@ import { TaskSummary, TaskSummaryColumnKey, TaskSummaryFieldKey, TaskSummaryFilt
               <mat-icon aria-hidden="true" fontIcon="content_copy"></mat-icon>
               <span i18n>Copy Task ID</span>
             </button>
-           <a mat-menu-item [routerLink]="['/tasks', element.id]">
+            <a mat-menu-item [routerLink]="['/tasks', element.id]">
               <mat-icon aria-hidden="true" fontIcon="visibility"></mat-icon>
               <span i18n> See task </span>
             </a>
+            <button *ngIf="isRetried(element)" mat-menu-item (click)="onRetries(element)">
+              <mat-icon aria-hidden="true" fontIcon="published_with_changes"></mat-icon>
+              <span i18n> See Retries </span>
+            </button>
             <button mat-menu-item (click)="onCancelTask(element.id)">
               <mat-icon aria-hidden="true" fontIcon="cancel"></mat-icon>
               <span i18n> Cancel task </span>
@@ -402,6 +407,19 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isNotSortableColumn(column: TaskSummaryColumnKey): boolean {
     return this.#tasksIndexService.isNotSortableColumn(column);
+  }
+
+  isRetried(task: TaskSummary): boolean {
+    return this.#tasksStatusesService.isRetried(task.status);
+  }
+
+  onRetries(task: TaskSummary): void {
+    const filter: TaskSummaryFilter = {
+      field: 'initialTaskId',
+      value: task.id,
+    };
+
+    this.onFiltersChange([filter]);
   }
 
   onRefresh() {

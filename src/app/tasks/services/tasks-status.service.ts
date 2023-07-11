@@ -22,4 +22,8 @@ export class TasksStatusesService {
   statusToLabel(status: TaskStatus): string {
     return this.statuses[status];
   }
+
+  isRetried(status: TaskStatus): boolean {
+    return status === TaskStatus.TASK_STATUS_RETRIED;
+  }
 }

@@ -24,7 +24,7 @@ import { TasksStatusesGroup } from '../types';
   <mat-card-content>
     <ul>
       <li *ngFor="let status of group.statuses">
-        <a routerLink="/tasks" [queryParams]="{ Status: status }">
+        <a routerLink="/tasks" [queryParams]="{ status: status }">
           <span>
             {{ statusToLabel(status) }}
           </span>
