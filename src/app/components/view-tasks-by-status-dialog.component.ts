@@ -52,7 +52,7 @@ import { IconsService } from '@services/icons.service';
           <span i18n>Clear</span>
         </button>
         <button mat-menu-item (click)="onRemove(index)" [disabled]="statusesCounts?.length === 1 && index === 0">
-          <mat-icon aria-hidden="true" [fontIcon]="getIcon('remove')"></mat-icon>
+          <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
           <span i18n>Remove</span>
         </button>
       </mat-menu>
