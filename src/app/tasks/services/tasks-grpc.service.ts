@@ -83,7 +83,8 @@ export class TasksGrpcService {
     return this.#tasksClient.cancelTasks(request);
   }
 
-  countByStatu$(): Observable<CountTasksByStatusResponse> {
+  countByStatu$(options: any, filters: any[]): Observable<CountTasksByStatusResponse> {
+    
     const request = new CountTasksByStatusRequest();
     return this.#tasksClient.countTasksByStatus(request);
   }

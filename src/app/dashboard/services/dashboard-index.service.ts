@@ -3,9 +3,26 @@ import { Injectable, inject } from '@angular/core';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { DashboardStorageService } from './dashboard-storage.service';
 import { TasksStatusesGroup } from '../types';
+import { TableService } from '@services/table.service';
 
 @Injectable()
 export class DashboardIndexService {
+
+  #dashboardStorageService = inject(DashboardStorageService);
+  #tasksStatusesService = inject(TasksStatusesService);
+
+  #tableService = inject(TableService);
+
+  readonly tableName: string = 'dashboard'
+
+
+  readonly columnsLabels: Record<any, string> = {
+    applications: $localize`Applications`,
+    partitions: $localize`Partitions`,
+    sessions: $localize`Sessions`,
+    results: $localize`Results`,
+  };
+
   readonly defaultStatusGroups: TasksStatusesGroup[] = [
     {
       name: 'Finished',
@@ -32,11 +49,40 @@ export class DashboardIndexService {
     },
   ];
 
+  
+  readonly defaultFilters: any[] = [];
+  readonly availableFiltersFields: any[] = [
+    {
+      field: 'applications',
+      type: 'text',
+    },
+    {
+      field: 'partitions',
+      type: 'text',
+    },
+    {
+      field: 'sessions',
+      type: 'text',
+    },
+    {
+      field: 'results',
+      type: 'text',
+    }
+  ];
+
+  readonly defaultOptions: any = {
+    pageIndex: 0,
+    pageSize: 20,
+    sort: {
+      active: 'submittedAt',
+      direction: 'desc',
+    },
+  };
+
   readonly defaultHideGroupsHeader = false;
   readonly defaultIntervalValue = 5;
 
-  #dashboardStorageService = inject(DashboardStorageService);
-  #tasksStatusesService = inject(TasksStatusesService);
+  
 
   // TODO: move to TasksStatusesService
   statuses(): { value: string, name: string }[] {
@@ -78,6 +124,42 @@ export class DashboardIndexService {
   saveIntervalValue(interval: number) {
     this.#dashboardStorageService.saveInterval(interval);
   }
+  
+  /**
+   * Filters
+   */
+
+  restoreFilters(): any[] {
+    return this.#tableService.restoreFilters<any>(this.tableName, this.availableFiltersFields) ?? this.defaultFilters;
+  }
+
+  saveFilters(filters: any[]): void {
+    this.#tableService.saveFilters(this.tableName, filters);
+  }
+
+  resetFilters(): any[] {
+    this.#tableService.resetFilters(this.tableName);
+
+    return this.defaultFilters;
+  }
+ 
+
+  
+  /**
+   * Options
+   */
+
+  saveOptions(options: any): void {
+    this.#tableService.saveOptions(this.tableName, options);
+  }
+
+  restoreOptions(): any {
+    const options = this.#tableService.restoreOptions<any>(this.tableName, this.defaultOptions);
+
+    return options;
+  }
+
+
 
   restoreHideGroupsHeader(): boolean {
     const storedValue = this.#dashboardStorageService.restoreHideGroupsHeader();
