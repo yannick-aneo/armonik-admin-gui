@@ -1,7 +1,7 @@
 import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { Injectable } from '@angular/core';
 import { ApplicationRawColumnKey, ApplicationRawFilter, ApplicationRawListOptions } from '@app/applications/types';
-import { TasksStatusesGroup } from '@app/dashboard/types';
+import { Line, TasksStatusesGroup } from '@app/dashboard/types';
 import { PartitionRawColumnKey, PartitionRawFilter, PartitionRawListOptions } from '@app/partitions/types';
 import { ResultRawColumnKey, ResultRawFilter, ResultRawListOptions } from '@app/results/types';
 import { SessionRawColumnKey, SessionRawFilter, SessionRawListOptions } from '@app/sessions/types';
@@ -13,38 +13,53 @@ import { Sidebar } from '@app/types/navigation';
 import { Theme } from '@app/types/themes';
 
 
+type defaultDashboardConfig = {
+  defaultApplications: ScopeConfig<ApplicationRawColumnKey, ApplicationRawListOptions, ApplicationRawFilter>,
+  defaultPartitions: ScopeConfig<ApplicationRawColumnKey, ApplicationRawListOptions, ApplicationRawFilter>,
+  defaultSessions: ScopeConfig<ApplicationRawColumnKey, ApplicationRawListOptions, ApplicationRawFilter>,
+}
+
 @Injectable()
 export class DefaultConfigService {
   readonly #defaultTheme: Theme = 'indigo-pink';
   readonly #defaultExternalServices: ExternalService[] = [];
+  
+  readonly #defaultDashboardLines: Line[] = [
+    {
+      name: 'Tasks by status', 
+      interval: 5,
+      hideGroupsHeader: false,
+      filters: [],
+      taskStatusesGroups: [
+        {
+          name: 'Finished',
+          color: '#00ff00',
+          statuses: [
+          TaskStatus.TASK_STATUS_COMPLETED,
+          TaskStatus.TASK_STATUS_CANCELLED,
+         ], 
+        },
+        {
+          name: 'Running',
+          color: '#ffa500',
+          statuses: [
+            TaskStatus.TASK_STATUS_PROCESSING,
+          ]
+        },
+        {
+          name: 'Errors',
+          color: '#ff0000',
+          statuses: [
+            TaskStatus.TASK_STATUS_ERROR,
+            TaskStatus.TASK_STATUS_TIMEOUT,
+          ]
+        },
+      ],
+      
+    }
+  ]; 
 
-  readonly #defaultDashboardHideGroupsHeader = false;
-  readonly #defaultDashboardInterval = 5;
-  readonly #defaultDashboardStatusGroups: TasksStatusesGroup[] = [
-    {
-      name: 'Finished',
-      color: '#00ff00',
-      statuses: [
-        TaskStatus.TASK_STATUS_COMPLETED,
-        TaskStatus.TASK_STATUS_CANCELLED,
-      ]
-    },
-    {
-      name: 'Running',
-      color: '#ffa500',
-      statuses: [
-        TaskStatus.TASK_STATUS_PROCESSING,
-      ]
-    },
-    {
-      name: 'Errors',
-      color: '#ff0000',
-      statuses: [
-        TaskStatus.TASK_STATUS_ERROR,
-        TaskStatus.TASK_STATUS_TIMEOUT,
-      ]
-    },
-  ];
+
 
   readonly #defaultSidebar: Sidebar[] = [
     'profile',
@@ -170,6 +185,11 @@ export class DefaultConfigService {
     filters: [],
   };
 
+      
+
+
+
+
   // We use getters to be able to deep copy the default config and to access the default config from the outside
 
   get defaultTheme(): Theme {
@@ -180,16 +200,8 @@ export class DefaultConfigService {
     return structuredClone(this.#defaultExternalServices);
   }
 
-  get defaultDashboardHideGroupsHeader(): boolean {
-    return structuredClone(this.#defaultDashboardHideGroupsHeader);
-  }
-
-  get defaultDashboardInterval(): number {
-    return structuredClone(this.#defaultDashboardInterval);
-  }
-
-  get defaultDashboardStatusGroups(): TasksStatusesGroup[] {
-    return structuredClone(this.#defaultDashboardStatusGroups);
+  get defaultDashboardLines(): Line[] {
+    return structuredClone(this.#defaultDashboardLines)
   }
 
   get defaultSidebar(): Sidebar[] {
@@ -224,9 +236,7 @@ export class DefaultConfigService {
     'navigation-sidebar': this.#defaultSidebar,
     'navigation-theme': this.#defaultTheme,
     'navigation-external-services': this.#defaultExternalServices,
-    'dashboard-status-groups': this.#defaultDashboardStatusGroups,
-    'dashboard-interval': this.#defaultDashboardInterval,
-    'dashboard-hide-groups-headers': this.#defaultDashboardHideGroupsHeader,
+    'dashboard-lines': this.#defaultDashboardLines,
     'applications-tasks-by-status': this.#defaultTasksByStatus,
     'sessions-tasks-by-status': this.#defaultTasksByStatus,
     'applications-columns': this.#defaultApplications.columns,

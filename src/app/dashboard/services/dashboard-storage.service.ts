@@ -36,7 +36,7 @@ export class DashboardStorageService {
   }
 
   saveStatusGroups(groups: TasksStatusesGroup[]) {
-    this.#storageService.setItem('dashboard-status-groups', groups);
+    this.#storageService.setItem('', groups);
   }
 
   restoreStatusGroups(): TasksStatusesGroup[] | null {

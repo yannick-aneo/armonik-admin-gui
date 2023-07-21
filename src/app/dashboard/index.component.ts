@@ -10,7 +10,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
 import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
-import { StatusCount } from '@app/tasks/types';
+import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
 import { Page } from '@app/types/pages';
 import { ActionsToolbarGroupComponent } from '@components/actions-toolbar-group.component';
 import { ActionsToolbarComponent } from '@components/actions-toolbar.component';
@@ -31,6 +31,12 @@ import { StatusesGroupCardComponent } from './components/statuses-group-card.com
 import { DashboardIndexService } from './services/dashboard-index.service';
 import { DashboardStorageService } from './services/dashboard-storage.service';
 import { TasksStatusesGroup } from './types';
+import { FiltersToolbarComponent } from '@components/filters-toolbar.component';
+import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
+import { TableService } from '@services/table.service';
+import { TableURLService } from '@services/table-url.service';
+import { TableStorageService } from '@services/table-storage.service';
+
 
 @Component({
   selector: 'app-dashboard-index',
@@ -46,34 +52,40 @@ import { TasksStatusesGroup } from './types';
   </app-page-section-header>
 
   <mat-toolbar>
-    <app-actions-toolbar>
-      <app-actions-toolbar-group>
-        <app-refresh-button [tooltip]="autoRefreshTooltip()" (refreshChange)="onRefresh()"></app-refresh-button>
-        <app-spinner *ngIf="loadTasksStatus"></app-spinner>
-      </app-actions-toolbar-group>
+   <mat-toolbar-row>
+      <app-actions-toolbar>
+        <app-actions-toolbar-group>
+          <app-refresh-button [tooltip]="autoRefreshTooltip()" (refreshChange)="onRefresh()"></app-refresh-button>
+          <app-spinner *ngIf="loadTasksStatus"></app-spinner>
+        </app-actions-toolbar-group>
 
-      <app-actions-toolbar-group>
-        <app-auto-refresh-button [intervalValue]="intervalValue" (intervalValueChange)="onIntervalValueChange($event)"></app-auto-refresh-button>
+        <app-actions-toolbar-group>
+          <app-auto-refresh-button [intervalValue]="intervalValue" (intervalValueChange)="onIntervalValueChange($event)"></app-auto-refresh-button>
 
-        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more options">
-          <mat-icon aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-          <button mat-menu-item (click)="onToggleGroupsHeader()">
-            <mat-icon aria-hidden="true" [fontIcon]="hideGroupHeaders ? getIcon('view') : getIcon('view-off')"></mat-icon>
-            <span i18n>
-              Toggle Groups Header
-            </span>
+          <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more options">
+            <mat-icon aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
           </button>
-          <button mat-menu-item (click)="onManageGroupsDialog()">
-            <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
-            <span i18n>
-              Manage Groups
-            </span>
-          </button>
-        </mat-menu>
-      </app-actions-toolbar-group>
-    </app-actions-toolbar>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="onToggleGroupsHeader()">
+              <mat-icon aria-hidden="true" [fontIcon]="hideGroupHeaders ? getIcon('view') : getIcon('view-off')"></mat-icon>
+              <span i18n>
+                Toggle Groups Header
+              </span>
+            </button>
+            <button mat-menu-item (click)="onManageGroupsDialog()">
+              <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
+              <span i18n>
+                Manage Groups
+              </span>
+            </button>
+          </mat-menu>
+        </app-actions-toolbar-group>
+      </app-actions-toolbar>
+   </mat-toolbar-row>
+   
+   <mat-toolbar-row>
+    <app-filters-toolbar [filters]="filters" [filtersFields]="availableFiltersFields" [columnsLabels]="columnsLabels()" (filtersChange)="onFiltersChange($event)"></app-filters-toolbar>
+  </mat-toolbar-row>
   </mat-toolbar>
 
   <div class="groups">
@@ -113,6 +125,10 @@ app-actions-toolbar {
     DashboardIndexService,
     AutoRefreshService,
     UtilsService,
+    TableService,
+    TableURLService,
+    TableStorageService,
+    TasksIndexService
   ],
   imports: [
     NgFor,
@@ -134,13 +150,17 @@ app-actions-toolbar {
     MatMenuModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    FiltersToolbarComponent
   ],
 })
 export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
   #iconsService = inject(IconsService);
+  #tasksIndexService = inject(TasksIndexService)
 
   hideGroupHeaders: boolean;
   statusGroups: TasksStatusesGroup[] = [];
+  availableColumns: any[]; 
+  options: any; // Type like DefaultConfigListOptions
   data: StatusCount[] = [];
   total: number;
 
@@ -154,6 +174,11 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
   interval$: Observable<number> = this._autoRefreshService.createInterval(this.interval, this.stopInterval);
 
   subscriptions: Subscription = new Subscription();
+  
+  
+  
+  availableFiltersFields: any;
+  filters: any;
 
   constructor(
     private _dialog: MatDialog,
@@ -164,11 +189,18 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.statusGroups = this._dashboardIndexService.restoreStatusGroups();
+     
+    // this.availableColumns = this._dashboardIndexService.availableColumns;
 
+    // this.options = this._dashboardIndexService.restoreOptions();
+
+    this.availableFiltersFields = this._dashboardIndexService.availableFiltersFields;
+    this.filters = this._dashboardIndexService.restoreFilters();
+
+    this.statusGroups = this._dashboardIndexService.restoreStatusGroups();
     this.intervalValue = this._dashboardIndexService.restoreIntervalValue();
     this.hideGroupHeaders = this._dashboardIndexService.restoreHideGroupsHeader();
-    this.sharableURL = this._shareURLService.generateSharableURL(null, null);
+    this.sharableURL = this._shareURLService.generateSharableURL(this.options, this.filters);
   }
 
   ngAfterViewInit() {
@@ -206,10 +238,22 @@ export class IndexComponent implements OnInit, AfterViewInit, OnDestroy {
     return this._autoRefreshService.autoRefreshTooltip(this.intervalValue);
   }
 
+  columnsLabels(): Record<TaskSummaryColumnKey, string> {
+    return this.#tasksIndexService.columnsLabels;
+  }
+
+
   onRefresh() {
     this.refresh.next();
   }
 
+  onFiltersChange(value: unknown[]) {
+    this.filters = value as any[];
+
+    //this._dashboardIndexService.saveFilters(this.filters);
+    //this.paginator.pageIndex = 0;
+    this.refresh.next();
+  }
   onIntervalValueChange(value: number) {
     this.intervalValue = value;
 

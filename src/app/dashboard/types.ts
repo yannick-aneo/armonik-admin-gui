@@ -1,6 +1,12 @@
 import {TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 
-
+export type Line = {
+  name: string,
+  interval: number,
+  hideGroupsHeader: boolean,
+  filters: [],
+  taskStatusesGroups: TasksStatusesGroup[],
+}
 
 export type TasksStatusesGroup = {
   name: string;

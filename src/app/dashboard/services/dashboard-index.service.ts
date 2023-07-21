@@ -3,17 +3,38 @@ import { Injectable, inject } from '@angular/core';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { DefaultConfigService } from '@services/default-config.service';
 import { DashboardStorageService } from './dashboard-storage.service';
-import { TasksStatusesGroup } from '../types';
+import { Line, TasksStatusesGroup } from '../types';
+import { TableService } from '@services/table.service';
 
 @Injectable()
 export class DashboardIndexService {
   #defaultConfigService = inject(DefaultConfigService);
   #dashboardStorageService = inject(DashboardStorageService);
   #tasksStatusesService = inject(TasksStatusesService);
+  #tableService = inject(TableService); 
+  
 
-  readonly defaultStatusGroups: TasksStatusesGroup[] = this.#defaultConfigService.defaultDashboardStatusGroups;
-  readonly defaultHideGroupsHeader = this.#defaultConfigService.defaultDashboardHideGroupsHeader;
-  readonly defaultInterval = this.#defaultConfigService.defaultDashboardInterval;
+  // readonly defaultColumns: any[] = this.#defaultConfigService.defaultDashboardConfig.columns;
+  // readonly defaultFilters: any[] = this.#defaultConfigService.defaultDashboardConfig.filters;
+  readonly defaultFilters: any[] = []; 
+  readonly availableFiltersFields: any[] = [
+   
+    {
+      field: 'applications',
+      type: 'text'
+    },
+    {
+      field: 'partitions',
+      type: 'text',
+    },
+    {
+      field: 'sessions',
+      type: 'text',
+    }
+  ];
+  readonly defaultLines: Line[] = this.#defaultConfigService.defaultDashboardLines;
+
+ 
 
 
   // TODO: move to TasksStatusesService
@@ -34,6 +55,56 @@ export class DashboardIndexService {
       };
     });
   }
+  
+
+
+  // saveOptions(options: any): void {
+  //   this.#tableService.saveOptions('dashboard-config-options', options);
+  // }
+
+  // restoreOptions(): any {
+  //   const options = this.#tableService.restoreOptions<any>('dashboard-config-options', this.defaultOptions);
+
+  //   return options;
+  // }
+
+
+  // saveColumns(columns: any[]): void {
+  //   this.#tableService.saveColumns('dashboard-config-columns', columns);
+  // }
+
+   // Something like DashboardConfigColumnKey
+  // restoreColumns(): any[] {
+  //   const columns = this.#tableService.restoreColumns<any[]>('dashboard-config-columns') ?? [];
+
+  //   return [...columns];
+  // }
+
+  // resetColumns(): any[] {
+  //   this.#tableService.resetColumns('dashboard-config-columns');
+
+  //   return Array.from(this.defaultColumns);
+  // }
+
+
+  // type-hint with something like DashboardConfigFilter[]
+  // saveFilters(filters: any[]): void {
+  //   this.#tableService.saveFilters('dashboard-config-filters', filters);
+  // }
+
+  restoreFilters(): any[] {
+    return this.#tableService.restoreFilters<any>('tasks-filters', this.availableFiltersFields) ?? this.defaultFilters;
+  }
+
+  // resetFilters(): any[] {
+  //   this.#tableService.resetFilters('dashboard-config-filters');
+
+  //   return this.defaultFilters;
+  // }
+
+
+
+
 
   restoreStatusGroups(): TasksStatusesGroup[] {
     return this.#dashboardStorageService.restoreStatusGroups() ?? this.defaultStatusGroups;
