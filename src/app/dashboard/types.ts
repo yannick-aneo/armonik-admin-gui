@@ -6,6 +6,7 @@ export type Line = {
   hideGroupsHeader: boolean,
   filters: [],
   taskStatusesGroups: TasksStatusesGroup[],
+  options: {}
 }
 
 export type TasksStatusesGroup = {

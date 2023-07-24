@@ -1,51 +1,23 @@
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '@services/storage.service';
-import { TasksStatusesGroup } from '../types';
+import { Line, TasksStatusesGroup } from '../types';
 
 @Injectable()
 export class DashboardStorageService {
 
   #storageService = inject(StorageService);
 
-  saveInterval(interval: number) {
-    this.#storageService.setItem('dashboard-interval', interval.toString());
+  saveLine(line: Line) {
+    this.#storageService.setItem('dashboard-lines', line);
   }
 
-  restoreInterval(): number | null {
-    const interval = this.#storageService.getItem<string>('dashboard-interval');
+  restoreLines(): Line[] | null {
+    const line = this.#storageService.getItem<Line[]>('dashboard-lines', true);
 
-    if (interval) {
-      return parseInt(interval, 10);
+    if (line) {
+      return line as Line[]
     }
-
     return null;
   }
 
-  saveHideGroupsHeader(hide: boolean) {
-    this.#storageService.setItem('dashboard-hide-groups-headers', hide.toString());
-  }
-
-  restoreHideGroupsHeader(): boolean | null {
-    const hide = this.#storageService.getItem('dashboard-hide-groups-headers');
-
-    if (hide) {
-      return hide === 'true';
-    }
-
-    return null;
-  }
-
-  saveStatusGroups(groups: TasksStatusesGroup[]) {
-    this.#storageService.setItem('', groups);
-  }
-
-  restoreStatusGroups(): TasksStatusesGroup[] | null {
-    const groups = this.#storageService.getItem<TasksStatusesGroup[]>('dashboard-status-groups', true);
-
-    if (groups) {
-      return groups as TasksStatusesGroup[];
-    }
-
-    return null;
-  }
 }

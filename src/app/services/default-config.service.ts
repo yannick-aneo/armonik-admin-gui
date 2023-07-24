@@ -12,13 +12,6 @@ import { ExternalService } from '@app/types/external-service';
 import { Sidebar } from '@app/types/navigation';
 import { Theme } from '@app/types/themes';
 
-
-type defaultDashboardConfig = {
-  defaultApplications: ScopeConfig<ApplicationRawColumnKey, ApplicationRawListOptions, ApplicationRawFilter>,
-  defaultPartitions: ScopeConfig<ApplicationRawColumnKey, ApplicationRawListOptions, ApplicationRawFilter>,
-  defaultSessions: ScopeConfig<ApplicationRawColumnKey, ApplicationRawListOptions, ApplicationRawFilter>,
-}
-
 @Injectable()
 export class DefaultConfigService {
   readonly #defaultTheme: Theme = 'indigo-pink';
@@ -30,6 +23,7 @@ export class DefaultConfigService {
       interval: 5,
       hideGroupsHeader: false,
       filters: [],
+      options: {},
       taskStatusesGroups: [
         {
           name: 'Finished',
@@ -236,9 +230,9 @@ export class DefaultConfigService {
     'navigation-sidebar': this.#defaultSidebar,
     'navigation-theme': this.#defaultTheme,
     'navigation-external-services': this.#defaultExternalServices,
-    'dashboard-lines': this.#defaultDashboardLines,
     'applications-tasks-by-status': this.#defaultTasksByStatus,
     'sessions-tasks-by-status': this.#defaultTasksByStatus,
+    'dashboard-lines': this.#defaultDashboardLines,
     'applications-columns': this.#defaultApplications.columns,
     'applications-options': this.#defaultApplications.options,
     'applications-filters': this.#defaultApplications.filters,
