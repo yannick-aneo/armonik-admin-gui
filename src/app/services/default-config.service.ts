@@ -1,7 +1,7 @@
 import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
 import { Injectable } from '@angular/core';
 import { ApplicationRawColumnKey, ApplicationRawFilter, ApplicationRawListOptions } from '@app/applications/types';
-import { Line, TasksStatusesGroup } from '@app/dashboard/types';
+import { Line } from '@app/dashboard/types';
 import { PartitionRawColumnKey, PartitionRawFilter, PartitionRawListOptions } from '@app/partitions/types';
 import { ResultRawColumnKey, ResultRawFilter, ResultRawListOptions } from '@app/results/types';
 import { SessionRawColumnKey, SessionRawFilter, SessionRawListOptions } from '@app/sessions/types';

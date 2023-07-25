@@ -13,6 +13,7 @@ export class DashboardIndexService {
   
   
   readonly defaultLines: Line[] = this.#defaultConfigService.defaultDashboardLines;
+  readonly availableFiltersFields: any[] = []; 
 
  
 
@@ -40,7 +41,7 @@ export class DashboardIndexService {
     return this.#dashboardStorageService.restoreLines() ?? this.defaultLines
   }
 
-  saveLine(line: Line) : void {
-    this.#dashboardStorageService.saveLine(line);
+  saveLines(lines: Line[]) : void {
+    this.#dashboardStorageService.saveLines(lines);
   }
 }

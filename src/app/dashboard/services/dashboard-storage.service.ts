@@ -7,17 +7,16 @@ export class DashboardStorageService {
 
   #storageService = inject(StorageService);
 
-  saveLine(line: Line) {
-    this.#storageService.setItem('dashboard-lines', line);
+  saveLines(lines: Line[]) :void {
+    this.#storageService.setItem('dashboard-lines', lines);
   }
 
   restoreLines(): Line[] | null {
-    const line = this.#storageService.getItem<Line[]>('dashboard-lines', true);
+    const storedLines = this.#storageService.getItem<Line[]>('dashboard-lines', true);
 
-    if (line) {
-      return line as Line[]
+    if (storedLines) {
+      return storedLines as Line[]
     }
     return null;
   }
-
 }
