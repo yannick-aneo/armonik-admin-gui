@@ -16,6 +16,7 @@ import { AppIndexComponent } from '@app/types/components';
 import { Page } from '@app/types/pages';
 import { FiltersToolbarComponent } from '@components/filters-toolbar.component';
 import { PageHeaderComponent } from '@components/page-header.component';
+import { TableEmptyDataComponent } from '@components/table/table-empty-data.component';
 import { TableInspectObjectComponent } from '@components/table/table-inspect-object.component';
 import { TableActionsToolbarComponent } from '@components/table-actions-toolbar.component';
 import { TableContainerComponent } from '@components/table-container.component';
@@ -33,7 +34,6 @@ import { UtilsService } from '@services/utils.service';
 import { PartitionsGrpcService } from './services/partitions-grpc.service';
 import { PartitionsIndexService } from './services/partitions-index.service';
 import { PartitionRaw, PartitionRawColumnKey, PartitionRawFieldKey, PartitionRawFilter, PartitionRawFilterField, PartitionRawListOptions } from './types';
-import { TableEmptyDataComponent } from '@components/table/table-empty-data.component';
 
 @Component({
   selector: 'app-partitions-index',

@@ -1,39 +1,39 @@
+import { NgForOf, NgIf } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar'
-import { AutoRefreshButtonComponent } from '../../components/auto-refresh-button.component';
-import { PageSectionHeaderComponent } from '../../components/page-section-header.component';
-import { PageSectionComponent } from '../../components/page-section.component';
-import { RefreshButtonComponent } from '../../components/refresh-button.component';
-import { SpinnerComponent } from '../../components/spinner.component';
-import { FiltersToolbarComponent } from '../../components/filters-toolbar.component';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { StatusesGroupCardComponent } from './statuses-group-card.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
 import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
 import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
+import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
+import { Filter } from '@app/types/filters';
+import { Page } from '@app/types/pages';
 import { AutoRefreshService } from '@services/auto-refresh.service';
+import { IconsService } from '@services/icons.service';
 import { QueryParamsService } from '@services/query-params.service';
 import { ShareUrlService } from '@services/share-url.service';
 import { StorageService } from '@services/storage.service';
 import { UtilsService } from '@services/utils.service';
+import { ManageGroupsDialogComponent } from './manage-groups-dialog.component';
+import { StatusesGroupCardComponent } from './statuses-group-card.component';
+import { ActionsToolbarGroupComponent } from '../../components/actions-toolbar-group.component';
+import { ActionsToolbarComponent } from '../../components/actions-toolbar.component';
+import { AutoRefreshButtonComponent } from '../../components/auto-refresh-button.component';
+import { FiltersToolbarComponent } from '../../components/filters-toolbar.component';
+import { PageSectionHeaderComponent } from '../../components/page-section-header.component';
+import { PageSectionComponent } from '../../components/page-section.component';
+import { RefreshButtonComponent } from '../../components/refresh-button.component';
+import { SpinnerComponent } from '../../components/spinner.component';
 import { DashboardIndexService } from '../services/dashboard-index.service';
 import { DashboardStorageService } from '../services/dashboard-storage.service';
 import { Line } from '../types';
-import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
-import { Page } from '@app/types/pages';
-import { ActionsToolbarGroupComponent } from '../../components/actions-toolbar-group.component';
-import { ActionsToolbarComponent } from '../../components/actions-toolbar.component';
-import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
-import { ManageGroupsDialogComponent } from './manage-groups-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { Filter } from '@app/types/filters';
-import { NgForOf, NgIf } from '@angular/common';
-import { IconsService } from '@services/icons.service';
 
 @Component({
-    selector: 'app-line',
-    template: `      
+  selector: 'app-line',
+  template: `      
         <app-page-section>
         <app-page-section-header icon="adjust">
             <span i18n="Section title">{{ line.name }}</span>
@@ -85,7 +85,7 @@ import { IconsService } from '@services/icons.service';
         </div>
         </app-page-section>
   `,
-    styles: [`
+  styles: [`
        app-actions-toolbar {
         flex-grow: 1;
        }
@@ -97,49 +97,49 @@ import { IconsService } from '@services/icons.service';
           grid-gap: 1rem;
         }
     `],
-    standalone: true,
-    providers: [
-        TasksStatusesService,
-        ShareUrlService,
-        QueryParamsService,
-        TasksGrpcService,
-        StorageService,
-        DashboardStorageService,
-        DashboardIndexService,
-        AutoRefreshService,
-        UtilsService,
-        TasksIndexService,
-        TasksGrpcService, 
-        ],
-    imports: [
-        PageSectionComponent,
-        PageSectionHeaderComponent,
-        ActionsToolbarComponent,
-        RefreshButtonComponent,
-        SpinnerComponent,
-        ActionsToolbarGroupComponent,
-        AutoRefreshButtonComponent,
-        FiltersToolbarComponent,
-        MatToolbarModule,
-        MatIconModule,
-        MatMenuModule,
-        StatusesGroupCardComponent,
-        NgIf,
-        NgForOf
-    ]
+  standalone: true,
+  providers: [
+    TasksStatusesService,
+    ShareUrlService,
+    QueryParamsService,
+    TasksGrpcService,
+    StorageService,
+    DashboardStorageService,
+    DashboardIndexService,
+    AutoRefreshService,
+    UtilsService,
+    TasksIndexService,
+    TasksGrpcService, 
+  ],
+  imports: [
+    PageSectionComponent,
+    PageSectionHeaderComponent,
+    ActionsToolbarComponent,
+    RefreshButtonComponent,
+    SpinnerComponent,
+    ActionsToolbarGroupComponent,
+    AutoRefreshButtonComponent,
+    FiltersToolbarComponent,
+    MatToolbarModule,
+    MatIconModule,
+    MatMenuModule,
+    StatusesGroupCardComponent,
+    NgIf,
+    NgForOf
+  ]
 })
 export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
  
- @Input({ required: true }) line: Line;
- @Output() saveChange: EventEmitter<void> = new EventEmitter<void>();
- @Output() filtersChange: EventEmitter<Filter<any>[]> = new EventEmitter<Filter<any>[]>();
- @Output() toggleGroupsHeaderChange: EventEmitter<void> = new EventEmitter<void>();
- @Output() manageGroupsDialogChange: EventEmitter<void> = new EventEmitter<void>()
+  @Input({ required: true }) line: Line;
+  @Output() saveChange: EventEmitter<void> = new EventEmitter<void>();
+  @Output() filtersChange: EventEmitter<Filter<any>[]> = new EventEmitter<Filter<any>[]>();
+  @Output() toggleGroupsHeaderChange: EventEmitter<void> = new EventEmitter<void>();
+  @Output() manageGroupsDialogChange: EventEmitter<void> = new EventEmitter<void>();
 
 
   _dialog = inject(MatDialog);
   #autoRefreshService = inject(AutoRefreshService);
-  #iconsService = inject(IconsService)
+  #iconsService = inject(IconsService);
   #taskGrpcService = inject(TasksGrpcService);
   #tasksIndexService = inject(TasksIndexService); 
   #dashboardIndexService = inject(DashboardIndexService); 
@@ -207,19 +207,19 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
     this.line.interval = value;
 
     if(value === 0) {
-        this.stopInterval.next();
-      } else {
-        this.interval.next(value);
-        this.refresh.next();
-      }
+      this.stopInterval.next();
+    } else {
+      this.interval.next(value);
+      this.refresh.next();
+    }
 
-      this.saveChange.emit()
+    this.saveChange.emit();
 
   }
 
   onToggleGroupsHeader() {
-      this.line.hideGroupsHeader = !this.line.hideGroupsHeader; 
-      this.toggleGroupsHeaderChange.emit(); 
+    this.line.hideGroupsHeader = !this.line.hideGroupsHeader; 
+    this.toggleGroupsHeaderChange.emit(); 
       
   }
 
@@ -243,7 +243,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
 
   onFiltersChange(value: unknown[]) {
     this.line.filters = value as [];
-    this.filtersChange.emit()
+    this.filtersChange.emit();
     this.refresh.next();
   }
 }

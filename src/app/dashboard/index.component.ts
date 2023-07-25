@@ -8,12 +8,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
+import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
 import { Page } from '@app/types/pages';
 import { ActionsToolbarGroupComponent } from '@components/actions-toolbar-group.component';
 import { ActionsToolbarComponent } from '@components/actions-toolbar.component';
 import { AutoRefreshButtonComponent } from '@components/auto-refresh-button.component';
+import { FiltersToolbarComponent } from '@components/filters-toolbar.component';
 import { PageHeaderComponent } from '@components/page-header.component';
 import { PageSectionHeaderComponent } from '@components/page-section-header.component';
 import { PageSectionComponent } from '@components/page-section.component';
@@ -24,21 +26,19 @@ import { IconsService } from '@services/icons.service';
 import { QueryParamsService } from '@services/query-params.service';
 import { ShareUrlService } from '@services/share-url.service';
 import { StorageService } from '@services/storage.service';
+import { TableStorageService } from '@services/table-storage.service';
+import { TableURLService } from '@services/table-url.service';
+import { TableService } from '@services/table.service';
 import { UtilsService } from '@services/utils.service';
+import { LineComponent } from './components/line.component';
 import { DashboardIndexService } from './services/dashboard-index.service';
 import { DashboardStorageService } from './services/dashboard-storage.service';
 import { Line } from './types';
-import { FiltersToolbarComponent } from '@components/filters-toolbar.component';
-import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
-import { LineComponent } from "./components/line.component";
-import { TableService } from '@services/table.service';
-import { TableURLService } from '@services/table-url.service';
-import { TableStorageService } from '@services/table-storage.service';
 
 
 @Component({
-    selector: 'app-dashboard-index',
-    template: `
+  selector: 'app-dashboard-index',
+  template: `
 <app-page-header [sharableURL]="sharableURL">
   <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="getPageIcon('dashboard')"></mat-icon>
   <span i18n="Page title"> Dashboard </span>
@@ -53,8 +53,8 @@ import { TableStorageService } from '@services/table-storage.service';
   ></app-line>
 </section>
   `,
-    styles: [
-        `
+  styles: [
+    `
       app-line {
         margin: 1em; 
       }
@@ -63,48 +63,48 @@ import { TableStorageService } from '@services/table-storage.service';
         width: 100%;
       }
     `
-    ],
-    standalone: true,
-    providers: [
-        TasksStatusesService,
-        ShareUrlService,
-        QueryParamsService,
-        TasksGrpcService,
-        StorageService,
-        DashboardStorageService,
-        DashboardIndexService,
-        AutoRefreshService,
-        UtilsService,
-        TasksIndexService,
-        TableService,
-        TableURLService,
-        TableStorageService
-    ],
-    imports: [
-        NgFor,
-        NgIf,
-        JsonPipe,
-        PageHeaderComponent,
-        PageSectionComponent,
-        SpinnerComponent,
-        PageSectionHeaderComponent,
-        ActionsToolbarComponent,
-        ActionsToolbarGroupComponent,
-        RefreshButtonComponent,
-        AutoRefreshButtonComponent,
-        MatIconModule,
-        MatToolbarModule,
-        MatButtonModule,
-        MatMenuModule,
-        MatCardModule,
-        MatProgressSpinnerModule,
-        FiltersToolbarComponent,
-        LineComponent
-    ]
+  ],
+  standalone: true,
+  providers: [
+    TasksStatusesService,
+    ShareUrlService,
+    QueryParamsService,
+    TasksGrpcService,
+    StorageService,
+    DashboardStorageService,
+    DashboardIndexService,
+    AutoRefreshService,
+    UtilsService,
+    TasksIndexService,
+    TableService,
+    TableURLService,
+    TableStorageService
+  ],
+  imports: [
+    NgFor,
+    NgIf,
+    JsonPipe,
+    PageHeaderComponent,
+    PageSectionComponent,
+    SpinnerComponent,
+    PageSectionHeaderComponent,
+    ActionsToolbarComponent,
+    ActionsToolbarGroupComponent,
+    RefreshButtonComponent,
+    AutoRefreshButtonComponent,
+    MatIconModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    FiltersToolbarComponent,
+    LineComponent
+  ]
 })
 export class IndexComponent implements OnInit, OnDestroy {
   #iconsService = inject(IconsService);
-  #tasksIndexService = inject(TasksIndexService)
+  #tasksIndexService = inject(TasksIndexService);
 
   lines: Line[]; 
   options: any; 
@@ -123,8 +123,8 @@ export class IndexComponent implements OnInit, OnDestroy {
   
   
   
-  availableFiltersFields: []
-  filters: []
+  availableFiltersFields: [];
+  filters: [];
 
   constructor(
     private _shareURLService: ShareUrlService,
@@ -133,7 +133,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.lines = this._dashboardIndexService.restoreLines()
+    this.lines = this._dashboardIndexService.restoreLines();
     this.sharableURL = this._shareURLService.generateSharableURL(this.options, this.filters);
   }
 
@@ -164,7 +164,7 @@ export class IndexComponent implements OnInit, OnDestroy {
   }
 
   onSaveChange() {
-    this._dashboardIndexService.saveLines(this.lines)
+    this._dashboardIndexService.saveLines(this.lines);
   }
 
 }

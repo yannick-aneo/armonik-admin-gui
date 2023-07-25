@@ -6,8 +6,8 @@ export type Line = {
   hideGroupsHeader: boolean,
   filters: [],
   taskStatusesGroups: TasksStatusesGroup[],
-  options: {}
-}
+  options: object
+};
 
 export type TasksStatusesGroup = {
   name: string;

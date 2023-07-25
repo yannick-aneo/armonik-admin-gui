@@ -15,7 +15,7 @@ export class DashboardStorageService {
     const storedLines = this.#storageService.getItem<Line[]>('dashboard-lines', true);
 
     if (storedLines) {
-      return storedLines as Line[]
+      return storedLines as Line[];
     }
     return null;
   }

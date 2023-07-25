@@ -29,9 +29,9 @@ export class DefaultConfigService {
           name: 'Finished',
           color: '#00ff00',
           statuses: [
-          TaskStatus.TASK_STATUS_COMPLETED,
-          TaskStatus.TASK_STATUS_CANCELLED,
-         ], 
+            TaskStatus.TASK_STATUS_COMPLETED,
+            TaskStatus.TASK_STATUS_CANCELLED,
+          ], 
         },
         {
           name: 'Running',
@@ -194,7 +194,7 @@ export class DefaultConfigService {
   }
 
   get defaultDashboardLines(): Line[] {
-    return structuredClone(this.#defaultDashboardLines)
+    return structuredClone(this.#defaultDashboardLines);
   }
 
   get defaultSidebar(): Sidebar[] {
