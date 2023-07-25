@@ -12,7 +12,7 @@ export class DashboardStorageService {
   }
 
   restoreLines(): Line[] | null {
-    const storedLines = this.#storageService.getItem<Line[]>('dashboard-lines', true);
+    const storedLines = this.#storageService.getItem<Line[]>('dashboard-lines', true) as Line[] | null;
 
     if (storedLines) {
       return storedLines as Line[];
