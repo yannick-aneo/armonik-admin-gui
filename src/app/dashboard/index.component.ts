@@ -43,7 +43,7 @@ import { TableStorageService } from '@services/table-storage.service';
   <mat-icon matListItemIcon aria-hidden="true" [fontIcon]="getPageIcon('dashboard')"></mat-icon>
   <span i18n="Page title"> Dashboard </span>
 </app-page-header>
-<div class="lines" *ngFor="let line of lines" >
+<section class="lines" *ngFor="let line of lines" >
   <app-line 
       [line]="line" 
       (saveChange)="onSaveChange()"
@@ -51,7 +51,7 @@ import { TableStorageService } from '@services/table-storage.service';
       (toggleGroupsHeaderChange)="onSaveChange()"
       (manageGroupsDialogChange)="onSaveChange()"
   ></app-line>
-</div>
+</section>
   `,
     styles: [
         `
@@ -120,8 +120,8 @@ export class IndexComponent implements OnInit, OnDestroy {
   
   
   
-  availableFiltersFields: any;
-  filters: any;
+  availableFiltersFields: []
+  filters: []
 
   constructor(
     private _shareURLService: ShareUrlService,

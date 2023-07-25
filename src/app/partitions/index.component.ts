@@ -168,7 +168,6 @@ app-table-actions-toolbar {
 })
 export class IndexComponent implements OnInit, AfterViewInit, OnDestroy, AppIndexComponent<PartitionRaw> {
   #notificationService = inject(NotificationService);
-  #iconsService = inject(IconsService);
 
   displayedColumns: PartitionRawColumnKey[] = [];
   availableColumns: PartitionRawColumnKey[] = [];

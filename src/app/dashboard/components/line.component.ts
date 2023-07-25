@@ -86,6 +86,9 @@ import { IconsService } from '@services/icons.service';
         </app-page-section>
   `,
     styles: [`
+       app-actions-toolbar {
+        flex-grow: 1;
+       }
        .groups {
           margin-top: 1rem;
 
@@ -140,13 +143,12 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   #taskGrpcService = inject(TasksGrpcService);
   #tasksIndexService = inject(TasksIndexService); 
   #dashboardIndexService = inject(DashboardIndexService); 
-    
-  loadTasksStatus: boolean; 
+
   total: number;
+  loadTasksStatus = false;
   data: StatusCount[] = [];
   availableFiltersFields: any[] = [];
-  
-  
+
   refresh: Subject<void> = new Subject<void>();
   stopInterval: Subject<void> = new Subject<void>();
   interval: Subject<number> = new Subject<number>();
@@ -154,7 +156,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   interval$: Observable<number> = this.#autoRefreshService.createInterval(this.interval, this.stopInterval);
 
   ngOnInit(): void {
-    this.loadTasksStatus = false; 
+    this.loadTasksStatus = true; 
     this.availableFiltersFields = this.#dashboardIndexService.availableFiltersFields;                              
   }
 
@@ -236,13 +238,12 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
       this.line.taskStatusesGroups = result;
       this.manageGroupsDialogChange.emit(); 
     });
+    
   }
 
   onFiltersChange(value: unknown[]) {
-
     this.line.filters = value as [];
     this.filtersChange.emit()
-    //this.paginator.pageIndex = 0;
     this.refresh.next();
   }
 }
