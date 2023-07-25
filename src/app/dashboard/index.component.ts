@@ -55,6 +55,9 @@ import { TableStorageService } from '@services/table-storage.service';
   `,
     styles: [
         `
+      app-line {
+        margin: 1em; 
+      }
       app-actions-toolbar {
         display: block;
         width: 100%;

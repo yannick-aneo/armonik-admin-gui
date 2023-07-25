@@ -48,8 +48,7 @@ export class DefaultConfigService {
             TaskStatus.TASK_STATUS_TIMEOUT,
           ]
         },
-      ],
-      
+      ],  
     }
   ]; 
 
