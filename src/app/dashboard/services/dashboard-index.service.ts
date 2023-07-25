@@ -41,7 +41,7 @@ export class DashboardIndexService {
     return this.#dashboardStorageService.restoreLines() ?? this.defaultLines;
   }
 
-  saveLines(lines: Line[]) : void {
+  saveLines(lines: Line[]): void {
     this.#dashboardStorageService.saveLines(lines);
   }
 }
