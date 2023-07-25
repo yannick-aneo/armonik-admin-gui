@@ -1,13 +1,11 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
-import { ActionsToolbarGroupComponent } from '../../components/actions-toolbar-group.component';
-import { PageSectionComponent } from '../../components/page-section.component';
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { AutoRefreshButtonComponent } from '../../components/auto-refresh-button.component';
 import { PageSectionHeaderComponent } from '../../components/page-section-header.component';
-import { ActionsToolbarComponent } from '../../components/actions-toolbar.component';
+import { PageSectionComponent } from '../../components/page-section.component';
 import { RefreshButtonComponent } from '../../components/refresh-button.component';
 import { SpinnerComponent } from '../../components/spinner.component';
-import { AutoRefreshButtonComponent } from '../../components/auto-refresh-button.component';
 import { FiltersToolbarComponent } from '../../components/filters-toolbar.component';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { StatusesGroupCardComponent } from './statuses-group-card.component';
@@ -24,6 +22,8 @@ import { DashboardStorageService } from '../services/dashboard-storage.service';
 import { Line } from '../types';
 import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
 import { Page } from '@app/types/pages';
+import { ActionsToolbarGroupComponent } from '../../components/actions-toolbar-group.component';
+import { ActionsToolbarComponent } from '../../components/actions-toolbar.component';
 import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
 import { ManageGroupsDialogComponent } from './manage-groups-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
