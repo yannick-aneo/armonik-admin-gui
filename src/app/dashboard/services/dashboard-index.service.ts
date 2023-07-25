@@ -37,7 +37,7 @@ export class DashboardIndexService {
     });
   }
   
-  restoreLines() : Line[] {
+  restoreLines(): Line[] {
     return this.#dashboardStorageService.restoreLines() ?? this.defaultLines;
   }
 
