@@ -58,6 +58,7 @@ import { Line } from './types';
       app-line {
         margin: 1em; 
       }
+      
       app-actions-toolbar {
         display: block;
         width: 100%;
