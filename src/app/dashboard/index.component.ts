@@ -1,13 +1,12 @@
 import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { AfterViewInit, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
@@ -26,7 +25,6 @@ import { QueryParamsService } from '@services/query-params.service';
 import { ShareUrlService } from '@services/share-url.service';
 import { StorageService } from '@services/storage.service';
 import { UtilsService } from '@services/utils.service';
-import { StatusesGroupCardComponent } from './components/statuses-group-card.component';
 import { DashboardIndexService } from './services/dashboard-index.service';
 import { DashboardStorageService } from './services/dashboard-storage.service';
 import { Line } from './types';
@@ -57,7 +55,6 @@ import { TableStorageService } from '@services/table-storage.service';
   `,
     styles: [
         `
-
       app-actions-toolbar {
         display: block;
         width: 100%;
@@ -92,8 +89,6 @@ import { TableStorageService } from '@services/table-storage.service';
         ActionsToolbarGroupComponent,
         RefreshButtonComponent,
         AutoRefreshButtonComponent,
-        StatusesGroupCardComponent,
-        MatDialogModule,
         MatIconModule,
         MatToolbarModule,
         MatButtonModule,
