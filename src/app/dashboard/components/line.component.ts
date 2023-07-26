@@ -1,6 +1,6 @@
 import { NgForOf, NgIf } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -17,6 +17,7 @@ import { QueryParamsService } from '@services/query-params.service';
 import { ShareUrlService } from '@services/share-url.service';
 import { StorageService } from '@services/storage.service';
 import { UtilsService } from '@services/utils.service';
+import { EditNameLineDialogComponent } from './edit-name-line-dialog.component';
 import { ManageGroupsDialogComponent } from './manage-groups-dialog.component';
 import { StatusesGroupCardComponent } from './statuses-group-card.component';
 import { ActionsToolbarGroupComponent } from '../../components/actions-toolbar-group.component';
@@ -54,16 +55,22 @@ import { Line } from '../types';
                     </button>
                     <mat-menu #menu="matMenu">
                         <button mat-menu-item (click)="onToggleGroupsHeader()">
-                        <mat-icon aria-hidden="true" [fontIcon]="line.hideGroupsHeader ? getIcon('view') : getIcon('view-off')"></mat-icon>
-                        <span i18n>
-                            Toggle Groups Header
-                        </span>
-                        </button>
+                          <mat-icon aria-hidden="true" [fontIcon]="line.hideGroupsHeader ? getIcon('view') : getIcon('view-off')"></mat-icon>
+                            <span i18n>
+                                Toggle Groups Header
+                            </span>
+                        </button> 
                         <button mat-menu-item (click)="onManageGroupsDialog()">
-                        <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
-                        <span i18n>
-                            Manage Groups
-                        </span>
+                              <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
+                              <span i18n>
+                                  Manage Groups
+                              </span>
+                        </button>
+                        <button mat-menu-item (click)="onEditNameLine(line.name)">
+                            <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
+                            <span i18n>
+                                  Edit name line
+                              </span> 
                         </button>
                     </mat-menu>
                     </app-actions-toolbar-group>
@@ -135,6 +142,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   @Output() filtersChange: EventEmitter<Filter<any>[]> = new EventEmitter<Filter<any>[]>();
   @Output() toggleGroupsHeaderChange: EventEmitter<void> = new EventEmitter<void>();
   @Output() manageGroupsDialogChange: EventEmitter<void> = new EventEmitter<void>();
+  @Output() editNameLineDialogChange: EventEmitter<void> = new EventEmitter<void>();
 
 
   _dialog = inject(MatDialog);
@@ -223,6 +231,26 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
       
   }
 
+  onEditNameLine(value: string) {
+    const dialogRef: MatDialogRef<EditNameLineDialogComponent, string> = this._dialog.open(EditNameLineDialogComponent, {
+      data: {
+        name: value
+      }
+    }); 
+
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result || result.trim() === '') {
+        return;
+      }
+
+      this.line.name = result;
+      this.editNameLineDialogChange.emit(); 
+    });
+
+    
+  }
+
   onManageGroupsDialog() {
     const dialogRef = this._dialog.open(ManageGroupsDialogComponent, {
       data: {
@@ -240,7 +268,6 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
     });
     
   }
-
   onFiltersChange(value: unknown[]) {
     this.line.filters = value as [];
     this.filtersChange.emit();

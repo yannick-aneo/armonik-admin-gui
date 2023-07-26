@@ -8,9 +8,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
-import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
-import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
+import { StatusCount } from '@app/tasks/types';
 import { Page } from '@app/types/pages';
 import { ActionsToolbarGroupComponent } from '@components/actions-toolbar-group.component';
 import { ActionsToolbarComponent } from '@components/actions-toolbar.component';
@@ -50,6 +49,7 @@ import { Line } from './types';
       (filtersChange)="onSaveChange()"
       (toggleGroupsHeaderChange)="onSaveChange()"
       (manageGroupsDialogChange)="onSaveChange()"
+      (editNameLineDialogChange)="onSaveChange()"
   ></app-line>
 </section>
   `,
@@ -76,10 +76,9 @@ import { Line } from './types';
     DashboardIndexService,
     AutoRefreshService,
     UtilsService,
-    TasksIndexService,
     TableService,
     TableURLService,
-    TableStorageService
+    TableStorageService,
   ],
   imports: [
     NgFor,
@@ -105,10 +104,8 @@ import { Line } from './types';
 })
 export class IndexComponent implements OnInit, OnDestroy {
   #iconsService = inject(IconsService);
-  #tasksIndexService = inject(TasksIndexService);
 
   lines: Line[]; 
-  options: any; 
   total: number;
   data: StatusCount[] = []; 
 
@@ -135,7 +132,7 @@ export class IndexComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.lines = this._dashboardIndexService.restoreLines();
-    this.sharableURL = this._shareURLService.generateSharableURL(this.options, this.filters);
+    this.sharableURL = this._shareURLService.generateSharableURL(null, this.filters);
   }
 
 
@@ -155,9 +152,6 @@ export class IndexComponent implements OnInit, OnDestroy {
     return this._autoRefreshService.autoRefreshTooltip(this.intervalValue);
   }
 
-  columnsLabels(): Record<TaskSummaryColumnKey, string> {
-    return this.#tasksIndexService.columnsLabels;
-  }
 
 
   onRefresh() {

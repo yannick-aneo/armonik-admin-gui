@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { StorageService } from '@services/storage.service';
-import { Line, TasksStatusesGroup } from '../types';
+import { Line } from '../types';
 
 @Injectable()
 export class DashboardStorageService {

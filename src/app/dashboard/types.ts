@@ -30,3 +30,8 @@ export type EditStatusGroupDialogData = {
   group: TasksStatusesGroup;
   statuses: StatusLabeled[];
 };
+
+export type EditNameLineData = {
+  name: string;
+};
+
