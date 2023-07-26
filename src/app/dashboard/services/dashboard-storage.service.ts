@@ -7,7 +7,7 @@ export class DashboardStorageService {
 
   #storageService = inject(StorageService);
 
-  saveLines(lines: Line[]) :void {
+  saveLines(lines: Line[]): void {
     this.#storageService.setItem('dashboard-lines', lines);
   }
 
