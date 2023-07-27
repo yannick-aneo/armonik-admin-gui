@@ -207,6 +207,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   columnsLabels(): Record<TaskSummaryColumnKey, string> {
     return this.#tasksIndexService.columnsLabels;
   }
+
   onRefresh() {
     this.refresh.next();
   }
