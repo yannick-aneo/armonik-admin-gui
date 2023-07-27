@@ -253,7 +253,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   }
 
   onManageGroupsDialog() {
-    const dialogRef = this._dialog.open(ManageGroupsDialogComponent, {
+    const dialogRef = this.#dialog.open(ManageGroupsDialogComponent, {
       data: {
         groups: this.line.taskStatusesGroups,
       }
