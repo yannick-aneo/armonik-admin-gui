@@ -233,7 +233,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   }
 
   onEditNameLine(value: string) {
-    const dialogRef: MatDialogRef<EditNameLineDialogComponent, string> = this._dialog.open(EditNameLineDialogComponent, {
+    const dialogRef: MatDialogRef<EditNameLineDialogComponent, string> = this.#dialog.open(EditNameLineDialogComponent, {
       data: {
         name: value
       }
