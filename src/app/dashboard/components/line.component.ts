@@ -165,7 +165,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
 
   ngOnInit(): void {
     this.loadTasksStatus = true; 
-    this.availableFiltersFields = this.#dashboardIndexService.availableFiltersFields;                              
+    this.availableFiltersFields = this.#dashboardIndexService.availableFiltersFields;
   }
 
 
