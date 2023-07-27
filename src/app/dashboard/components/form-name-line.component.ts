@@ -6,7 +6,6 @@ import {  MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Line } from '../types';
 
 @Component({
   selector: 'app-form-name-line',
@@ -16,7 +15,7 @@ import { Line } from '../types';
 
     <mat-form-field subscriptSizing="dynamic" appearance="outline">
       <mat-label for="name" i18n="Name of the statuses group"> Name </mat-label>
-      <input matInput id="name" type="text" formControlName="name" i18n-placeholder="Placeholder" placeholder="Name of your group" required i18n="Input error">
+      <input matInput id="name" type="text" formControlName="name" i18n-placeholder="Placeholder" placeholder="Name of your line" required i18n="Input error">
        <mat-error *ngIf="lineForm.get('name')?.hasError('required')">
       Name is <strong>required</strong>
       </mat-error>
@@ -57,7 +56,7 @@ mat-dialog-content {
   ]
 })
 export class FormNameLineComponent implements OnInit {
-  @Input() line: Line | null = null;
+  @Input() line: string | null = null;
 
   @Output() cancelChange = new EventEmitter<void>();
   @Output() submitChange = new EventEmitter<string>();
@@ -69,11 +68,13 @@ export class FormNameLineComponent implements OnInit {
   });
 
   ngOnInit() {
+    console.log(this.line);
     if(this.line) {
       this.lineForm.setValue({
-        name: this.line.name
+        name: this.line,
       });
     }
+
   }
 
 

@@ -44,3 +44,12 @@ export interface ViewArrayDialogData {
 }
 
 export type ViewArrayDialogResult = Record<string, never>;
+
+export type AddNameLineDialogData = {
+  name: string
+};
+
+export type EditNameLineData = {
+  name: string;
+};
+

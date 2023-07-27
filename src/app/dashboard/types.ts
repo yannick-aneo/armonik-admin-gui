@@ -7,7 +7,6 @@ export type Line = {
   // TODO: waiting for full filters before adding correct type.
   filters: [],
   taskStatusesGroups: TasksStatusesGroup[],
-  options: object
 };
 
 export type TasksStatusesGroup = {
@@ -31,7 +30,4 @@ export type EditStatusGroupDialogData = {
   statuses: StatusLabeled[];
 };
 
-export type EditNameLineData = {
-  name: string;
-};
 

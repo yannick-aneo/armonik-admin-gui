@@ -9,7 +9,6 @@ import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
 import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
-import { Filter } from '@app/types/filters';
 import { Page } from '@app/types/pages';
 import { AutoRefreshService } from '@services/auto-refresh.service';
 import { IconsService } from '@services/icons.service';
@@ -35,11 +34,6 @@ import { Line } from '../types';
 @Component({
   selector: 'app-line',
   template: `      
-        <app-page-section>
-        <app-page-section-header icon="adjust">
-            <span i18n="Section title">{{ line.name }}</span>
-        </app-page-section-header>
-
         <mat-toolbar>
             <mat-toolbar-row>
                 <app-actions-toolbar>
@@ -72,6 +66,10 @@ import { Line } from '../types';
                                   Edit name line
                               </span> 
                         </button>
+                        <button mat-menu-item (click)="onDeleteLine(line)">
+                            <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
+                            <span i18n="Delete the line">Delete line</span>
+                        </button>
                     </mat-menu>
                     </app-actions-toolbar-group>
                 </app-actions-toolbar>
@@ -90,7 +88,6 @@ import { Line } from '../types';
             [hideGroupHeaders]="line.hideGroupsHeader"
             ></app-statuses-group-card>
         </div>
-        </app-page-section>
   `,
   styles: [`
        app-actions-toolbar {
@@ -138,11 +135,8 @@ import { Line } from '../types';
 export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
  
   @Input({ required: true }) line: Line;
-  @Output() saveChange: EventEmitter<void> = new EventEmitter<void>();
-  @Output() filtersChange: EventEmitter<Filter<any>[]> = new EventEmitter<Filter<any>[]>();
-  @Output() toggleGroupsHeaderChange: EventEmitter<void> = new EventEmitter<void>();
-  @Output() manageGroupsDialogChange: EventEmitter<void> = new EventEmitter<void>();
-  @Output() editNameLineDialogChange: EventEmitter<void> = new EventEmitter<void>();
+  @Output() lineChange: EventEmitter<void> = new EventEmitter<void>();
+  @Output() lineDelete: EventEmitter<Line> = new EventEmitter<Line>();
 
 
   #dialog = inject(MatDialog);
@@ -222,13 +216,13 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
       this.refresh.next();
     }
 
-    this.saveChange.emit();
+    this.lineChange.emit();
 
   }
 
   onToggleGroupsHeader() {
     this.line.hideGroupsHeader = !this.line.hideGroupsHeader; 
-    this.toggleGroupsHeaderChange.emit(); 
+    this.lineChange.emit();
       
   }
 
@@ -239,17 +233,19 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
       }
     }); 
 
-
     dialogRef.afterClosed().subscribe((result) => {
       if (!result || result.trim() === '') {
         return;
       }
 
       this.line.name = result;
-      this.editNameLineDialogChange.emit(); 
+      this.lineChange.emit(); 
     });
 
-    
+  }
+
+  onDeleteLine(value: Line): void {
+    this.lineDelete.emit(value);
   }
 
   onManageGroupsDialog() {
@@ -265,13 +261,13 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
       }
 
       this.line.taskStatusesGroups = result;
-      this.manageGroupsDialogChange.emit(); 
+      this.lineChange.emit(); 
     });
     
   }
   onFiltersChange(value: unknown[]) {
     this.line.filters = value as [];
-    this.filtersChange.emit();
+    this.lineChange.emit();
     this.refresh.next();
   }
 }

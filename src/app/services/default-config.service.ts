@@ -23,7 +23,6 @@ export class DefaultConfigService {
       interval: 5,
       hideGroupsHeader: false,
       filters: [],
-      options: {},
       taskStatusesGroups: [
         {
           name: 'Finished',
