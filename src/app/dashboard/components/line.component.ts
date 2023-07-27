@@ -145,7 +145,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   @Output() editNameLineDialogChange: EventEmitter<void> = new EventEmitter<void>();
 
 
-  _dialog = inject(MatDialog);
+  #dialog = inject(MatDialog);
   #autoRefreshService = inject(AutoRefreshService);
   #iconsService = inject(IconsService);
   #taskGrpcService = inject(TasksGrpcService);
