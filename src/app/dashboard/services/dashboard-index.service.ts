@@ -10,13 +10,8 @@ export class DashboardIndexService {
   #defaultConfigService = inject(DefaultConfigService);
   #dashboardStorageService = inject(DashboardStorageService);
   #tasksStatusesService = inject(TasksStatusesService);
-  
-  
+
   readonly defaultLines: Line[] = this.#defaultConfigService.defaultDashboardLines;
-  readonly availableFiltersFields: any[] = []; 
-
- 
-
 
   // TODO: move to TasksStatusesService
   statuses(): { value: string, name: string }[] {
@@ -36,7 +31,7 @@ export class DashboardIndexService {
       };
     });
   }
-  
+
   restoreLines(): Line[] {
     return this.#dashboardStorageService.restoreLines() ?? this.defaultLines;
   }

@@ -19,6 +19,10 @@ export type ManageGroupsDialogData = {
   groups: TasksStatusesGroup[];
 };
 
+export type ManageGroupsDialogResult = {
+  groups: TasksStatusesGroup[];
+};
+
 export type StatusLabeled = { name: string, value: string };
 
 export type AddStatusGroupDialogData = {
@@ -29,5 +33,3 @@ export type EditStatusGroupDialogData = {
   group: TasksStatusesGroup;
   statuses: StatusLabeled[];
 };
-
-

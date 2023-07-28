@@ -45,11 +45,16 @@ export interface ViewArrayDialogData {
 
 export type ViewArrayDialogResult = Record<string, never>;
 
-export type AddNameLineDialogData = {
-  name: string
+export type AddLineDialogData = Record<string, never>;
+
+export type AddLineDialogResult = {
+  name: string;
 };
 
 export type EditNameLineData = {
   name: string;
 };
 
+export type EditNameLineResult = {
+  name: string;
+};
