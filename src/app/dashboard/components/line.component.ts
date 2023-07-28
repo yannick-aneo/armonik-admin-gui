@@ -1,7 +1,8 @@
 import { NgForOf, NgIf } from '@angular/common';
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
+import {  MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
@@ -29,7 +30,8 @@ import { RefreshButtonComponent } from '../../components/refresh-button.componen
 import { SpinnerComponent } from '../../components/spinner.component';
 import { DashboardIndexService } from '../services/dashboard-index.service';
 import { DashboardStorageService } from '../services/dashboard-storage.service';
-import { Line } from '../types';
+import { Line, TasksStatusesGroup } from '../types';
+
 
 @Component({
   selector: 'app-line',
@@ -44,9 +46,11 @@ import { Line } from '../types';
 
                     <app-actions-toolbar-group>
                     <app-auto-refresh-button [intervalValue]="line.interval" (intervalValueChange)="onIntervalValueChange($event)"></app-auto-refresh-button>
-                    <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more options">
-                        <mat-icon aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
-                    </button>
+      
+                    <button  mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more options" i18n-aria-label matTooltip="More Options" i18n-matTooltip>
+                      <mat-icon class="add-button" aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
+                     </button>
+                
                     <mat-menu #menu="matMenu">
                         <button mat-menu-item (click)="onToggleGroupsHeader()">
                           <mat-icon aria-hidden="true" [fontIcon]="line.hideGroupsHeader ? getIcon('view') : getIcon('view-off')"></mat-icon>
@@ -100,7 +104,10 @@ import { Line } from '../types';
           grid-template-columns: repeat(3, 1fr);
           grid-gap: 1rem;
         }
+
+
     `],
+
   standalone: true,
   providers: [
     TasksStatusesService,
@@ -127,6 +134,7 @@ import { Line } from '../types';
     MatToolbarModule,
     MatIconModule,
     MatMenuModule,
+    MatButtonModule,
     StatusesGroupCardComponent,
     NgIf,
     NgForOf
@@ -249,7 +257,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   }
 
   onManageGroupsDialog() {
-    const dialogRef = this.#dialog.open(ManageGroupsDialogComponent, {
+    const dialogRef: MatDialogRef<ManageGroupsDialogComponent, TasksStatusesGroup[]> = this.#dialog.open(ManageGroupsDialogComponent, {
       data: {
         groups: this.line.taskStatusesGroups,
       }

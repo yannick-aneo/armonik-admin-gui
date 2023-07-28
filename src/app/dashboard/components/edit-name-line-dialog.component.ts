@@ -37,9 +37,7 @@ export class EditNameLineDialogComponent implements OnInit  {
     this.name =  this.data.name;
   
   }
-
   
-
   onSubmit(result: string) {
     this._dialogRef.close(result);
   }

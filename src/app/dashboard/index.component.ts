@@ -232,7 +232,6 @@ export class IndexComponent implements OnInit, OnDestroy {
       this.lines.splice(index, 1);
     }
     this.onSaveChange(); 
-
   }
 
   onSaveChange() {

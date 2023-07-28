@@ -68,7 +68,7 @@ export class FormNameLineComponent implements OnInit {
   });
 
   ngOnInit() {
-    console.log(this.line);
+
     if(this.line) {
       this.lineForm.setValue({
         name: this.line,
