@@ -38,8 +38,6 @@ mat-dialog-content {
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
-
-
   `],
   standalone: true,
   providers: [
@@ -77,9 +75,8 @@ export class FormNameLineComponent implements OnInit {
 
   }
 
-
   onSubmit() {
-    const result = this.lineForm.value.name ?? ''; 
+    const result = this.lineForm.value.name ?? '';
     this.submitChange.emit(result);
   }
 

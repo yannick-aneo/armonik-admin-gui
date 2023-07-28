@@ -10,6 +10,7 @@ import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
 import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
+import { EditNameLineData, EditNameLineResult } from '@app/types/dialog';
 import { Page } from '@app/types/pages';
 import { AutoRefreshService } from '@services/auto-refresh.service';
 import { IconsService } from '@services/icons.service';
@@ -30,84 +31,83 @@ import { RefreshButtonComponent } from '../../components/refresh-button.componen
 import { SpinnerComponent } from '../../components/spinner.component';
 import { DashboardIndexService } from '../services/dashboard-index.service';
 import { DashboardStorageService } from '../services/dashboard-storage.service';
-import { Line, TasksStatusesGroup } from '../types';
-
+import { Line, ManageGroupsDialogData, ManageGroupsDialogResult } from '../types';
 
 @Component({
-  selector: 'app-line',
-  template: `      
-        <mat-toolbar>
-            <mat-toolbar-row>
-                <app-actions-toolbar>
-                    <app-actions-toolbar-group>
-                    <app-refresh-button [tooltip]="autoRefreshTooltip()" (refreshChange)="onRefresh()"></app-refresh-button>
-                    <app-spinner *ngIf="loadTasksStatus"></app-spinner>
-                    </app-actions-toolbar-group>
+  selector: 'app-dashboard-line',
+  template: `
+<mat-toolbar>
+  <mat-toolbar-row>
+    <app-actions-toolbar>
+      <app-actions-toolbar-group>
+        <app-refresh-button [tooltip]="autoRefreshTooltip()" (refreshChange)="onRefresh()"></app-refresh-button>
+        <app-spinner *ngIf="loadTasksStatus"></app-spinner>
+      </app-actions-toolbar-group>
 
-                    <app-actions-toolbar-group>
-                    <app-auto-refresh-button [intervalValue]="line.interval" (intervalValueChange)="onIntervalValueChange($event)"></app-auto-refresh-button>
-      
-                    <button  mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more options" i18n-aria-label matTooltip="More Options" i18n-matTooltip>
-                      <mat-icon class="add-button" aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
-                     </button>
-                
-                    <mat-menu #menu="matMenu">
-                        <button mat-menu-item (click)="onToggleGroupsHeader()">
-                          <mat-icon aria-hidden="true" [fontIcon]="line.hideGroupsHeader ? getIcon('view') : getIcon('view-off')"></mat-icon>
-                            <span i18n>
-                                Toggle Groups Header
-                            </span>
-                        </button> 
-                        <button mat-menu-item (click)="onManageGroupsDialog()">
-                              <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
-                              <span i18n>
-                                  Manage Groups
-                              </span>
-                        </button>
-                        <button mat-menu-item (click)="onEditNameLine(line.name)">
-                            <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
-                            <span i18n>
-                                  Edit name line
-                              </span> 
-                        </button>
-                        <button mat-menu-item (click)="onDeleteLine(line)">
-                            <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
-                            <span i18n="Delete the line">Delete line</span>
-                        </button>
-                    </mat-menu>
-                    </app-actions-toolbar-group>
-                </app-actions-toolbar>
-            </mat-toolbar-row>
-            
-            <mat-toolbar-row>
-                <app-filters-toolbar [filters]="line.filters" [filtersFields]="availableFiltersFields" [columnsLabels]="columnsLabels()" (filtersChange)="onFiltersChange($event)"></app-filters-toolbar>
-            </mat-toolbar-row>
-        </mat-toolbar>
+      <app-actions-toolbar-group>
+        <app-auto-refresh-button [intervalValue]="line.interval" (intervalValueChange)="onIntervalValueChange($event)"></app-auto-refresh-button>
 
-        <div class="groups">
-            <app-statuses-group-card
-            *ngFor="let group of line.taskStatusesGroups"
-            [group]="group"
-            [data]="data"
-            [hideGroupHeaders]="line.hideGroupsHeader"
-            ></app-statuses-group-card>
-        </div>
+        <button  mat-icon-button [matMenuTriggerFor]="menu" aria-label="Show more options" i18n-aria-label matTooltip="More Options" i18n-matTooltip>
+          <mat-icon class="add-button" aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
+        </button>
+
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="onToggleGroupsHeader()">
+            <mat-icon aria-hidden="true" [fontIcon]="line.hideGroupsHeader ? getIcon('view') : getIcon('view-off')"></mat-icon>
+            <span i18n>
+              Toggle Groups Header
+            </span>
+          </button>
+          <button mat-menu-item (click)="onManageGroupsDialog()">
+            <mat-icon aria-hidden="true" [fontIcon]="getIcon('tune')"></mat-icon>
+            <span i18n>
+              Manage Groups
+            </span>
+          </button>
+          <button mat-menu-item (click)="onEditNameLine(line.name)">
+            <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
+              <span i18n>
+                Edit name line
+              </span>
+          </button>
+          <button mat-menu-item (click)="onDeleteLine(line)">
+              <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
+              <span i18n>
+                Delete line
+              </span>
+          </button>
+        </mat-menu>
+        </app-actions-toolbar-group>
+    </app-actions-toolbar>
+  </mat-toolbar-row>
+
+  <mat-toolbar-row>
+    <app-filters-toolbar [filters]="line.filters" [filtersFields]="availableFiltersFields" [columnsLabels]="columnsLabels()" (filtersChange)="onFiltersChange($event)"></app-filters-toolbar>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<div class="groups">
+  <app-statuses-group-card
+  *ngFor="let group of line.taskStatusesGroups"
+  [group]="group"
+  [data]="data"
+  [hideGroupHeaders]="line.hideGroupsHeader"
+  ></app-statuses-group-card>
+</div>
   `,
   styles: [`
-       app-actions-toolbar {
-        flex-grow: 1;
-       }
-       .groups {
-          margin-top: 1rem;
+app-actions-toolbar {
+  flex-grow: 1;
+}
 
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          grid-gap: 1rem;
-        }
+.groups {
+  margin-top: 1rem;
 
-
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1rem;
+}
     `],
-
   standalone: true,
   providers: [
     TasksStatusesService,
@@ -115,12 +115,10 @@ import { Line, TasksStatusesGroup } from '../types';
     QueryParamsService,
     TasksGrpcService,
     StorageService,
-    DashboardStorageService,
-    DashboardIndexService,
     AutoRefreshService,
     UtilsService,
     TasksIndexService,
-    TasksGrpcService, 
+    TasksGrpcService,
   ],
   imports: [
     PageSectionComponent,
@@ -141,18 +139,15 @@ import { Line, TasksStatusesGroup } from '../types';
   ]
 })
 export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
- 
   @Input({ required: true }) line: Line;
   @Output() lineChange: EventEmitter<void> = new EventEmitter<void>();
   @Output() lineDelete: EventEmitter<Line> = new EventEmitter<Line>();
-
 
   #dialog = inject(MatDialog);
   #autoRefreshService = inject(AutoRefreshService);
   #iconsService = inject(IconsService);
   #taskGrpcService = inject(TasksGrpcService);
-  #tasksIndexService = inject(TasksIndexService); 
-  #dashboardIndexService = inject(DashboardIndexService); 
+  #tasksIndexService = inject(TasksIndexService);
 
   total: number;
   loadTasksStatus = false;
@@ -166,10 +161,9 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   interval$: Observable<number> = this.#autoRefreshService.createInterval(this.interval, this.stopInterval);
 
   ngOnInit(): void {
-    this.loadTasksStatus = true; 
-    this.availableFiltersFields = this.#dashboardIndexService.availableFiltersFields;
+    this.loadTasksStatus = true;
+    this.availableFiltersFields = this.#tasksIndexService.availableFiltersFields;
   }
-
 
   ngAfterViewInit() {
     const mergeSubscription = merge(this.refresh, this.interval$).pipe(
@@ -229,25 +223,23 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   }
 
   onToggleGroupsHeader() {
-    this.line.hideGroupsHeader = !this.line.hideGroupsHeader; 
+    this.line.hideGroupsHeader = !this.line.hideGroupsHeader;
     this.lineChange.emit();
-      
+
   }
 
   onEditNameLine(value: string) {
-    const dialogRef: MatDialogRef<EditNameLineDialogComponent, string> = this.#dialog.open(EditNameLineDialogComponent, {
+    const dialogRef: MatDialogRef<EditNameLineDialogComponent, EditNameLineResult> = this.#dialog.open<EditNameLineDialogComponent, EditNameLineData, EditNameLineResult>(EditNameLineDialogComponent, {
       data: {
         name: value
       }
-    }); 
+    });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (!result || result.trim() === '') {
-        return;
-      }
+      if (!result) return;
 
-      this.line.name = result;
-      this.lineChange.emit(); 
+      this.line.name = result.name;
+      this.lineChange.emit();
     });
 
   }
@@ -257,7 +249,7 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
   }
 
   onManageGroupsDialog() {
-    const dialogRef: MatDialogRef<ManageGroupsDialogComponent, TasksStatusesGroup[]> = this.#dialog.open(ManageGroupsDialogComponent, {
+    const dialogRef: MatDialogRef<ManageGroupsDialogComponent, ManageGroupsDialogResult> = this.#dialog.open<ManageGroupsDialogComponent, ManageGroupsDialogData, ManageGroupsDialogResult>(ManageGroupsDialogComponent, {
       data: {
         groups: this.line.taskStatusesGroups,
       }
@@ -268,10 +260,10 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
         return;
       }
 
-      this.line.taskStatusesGroups = result;
-      this.lineChange.emit(); 
+      this.line.taskStatusesGroups = result.groups;
+      this.lineChange.emit();
     });
-    
+
   }
   onFiltersChange(value: unknown[]) {
     this.line.filters = value as [];

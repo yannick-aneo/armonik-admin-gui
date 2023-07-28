@@ -16,10 +16,10 @@ import { Theme } from '@app/types/themes';
 export class DefaultConfigService {
   readonly #defaultTheme: Theme = 'indigo-pink';
   readonly #defaultExternalServices: ExternalService[] = [];
-  
+
   readonly #defaultDashboardLines: Line[] = [
     {
-      name: 'Tasks by status', 
+      name: 'Tasks by status',
       interval: 5,
       hideGroupsHeader: false,
       filters: [],
@@ -30,7 +30,7 @@ export class DefaultConfigService {
           statuses: [
             TaskStatus.TASK_STATUS_COMPLETED,
             TaskStatus.TASK_STATUS_CANCELLED,
-          ], 
+          ],
         },
         {
           name: 'Running',
@@ -47,9 +47,9 @@ export class DefaultConfigService {
             TaskStatus.TASK_STATUS_TIMEOUT,
           ]
         },
-      ],  
+      ],
     }
-  ]; 
+  ];
 
 
 
@@ -176,11 +176,6 @@ export class DefaultConfigService {
     },
     filters: [],
   };
-
-      
-
-
-
 
   // We use getters to be able to deep copy the default config and to access the default config from the outside
 

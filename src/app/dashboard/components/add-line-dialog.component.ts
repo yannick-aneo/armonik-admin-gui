@@ -1,15 +1,14 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { AddNameLineDialogData } from '@app/types/dialog';
+import { AddLineDialogData, AddLineDialogResult } from '@app/types/dialog';
 import { FormNameLineComponent } from './form-name-line.component';
 
 @Component({
   selector: 'app-add-line-dialog',
   template: `
-<h2 mat-dialog-title i18n="Dialog title">Add a new line</h2>
+<h2 mat-dialog-title i18n="Dialog title">Add a line</h2>
 
 <app-form-name-line
-  [line]="null"
   (cancelChange)="onNoClick()"
   (submitChange)="onSubmit($event)"
 ></app-form-name-line>
@@ -23,20 +22,16 @@ import { FormNameLineComponent } from './form-name-line.component';
     FormNameLineComponent
   ]
 })
-export class AddNameLineDialogComponent implements OnInit { 
-  name: string;
-
+export class AddLineDialogComponent {
   constructor(
-    public _dialogRef: MatDialogRef<AddNameLineDialogComponent, string>,
-    @Inject(MAT_DIALOG_DATA) public data: AddNameLineDialogData,
+    public _dialogRef: MatDialogRef<AddLineDialogComponent, AddLineDialogResult>,
+    @Inject(MAT_DIALOG_DATA) public data: AddLineDialogData,
   ) {}
 
-  ngOnInit(): void {
-    this.name = this.data.name;
-  }
-
   onSubmit(result: string) {
-    this._dialogRef.close(result);
+    this._dialogRef.close({
+      name: result
+    });
   }
 
   onNoClick(): void {
