@@ -53,8 +53,9 @@ import { Line } from './types';
           </button>
       </div>
 </section>
-<ng-container  class="lines" *ngFor="let line of lines" >
-  <app-page-section>
+<span *ngIf="lines.length === 0"> You have no lines displayed.</span>
+<ng-container *ngFor="let line of lines" >
+      <app-page-section>
         <app-page-section-header icon="adjust">
             <span i18n="Section title">{{ line.name }}</span>
         </app-page-section-header>
