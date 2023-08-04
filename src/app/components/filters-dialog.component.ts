@@ -1,5 +1,5 @@
 import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnInit, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { Observable, map, startWith, switchMap } from 'rxjs';
+import { Observable, map, startWith } from 'rxjs';
 import { ColumnKey, FieldKey } from '@app/types/data';
 import { FiltersDialogData } from '@app/types/dialog';
 import { Filter, FilterEvent, FilterField, FilterFieldSelect, FilterInput, FilterInputDate, FilterInputSelect, FilterInputText, FilterInputType } from '@app/types/filters';
@@ -34,17 +34,17 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
           <mat-form-field appearance="outline"  subscriptSizing="dynamic">
             <mat-label i18n="Label input">Column</mat-label>
             <input type="text"
-                  placeholder="Pick one"
-                  aria-label="Number"
+                  placeholder="Pick an option"
+                  aria-label="filters option"
                   matInput
                   [formControl]="filterForm"
                   [matAutocomplete]="auto"
                   [value]="filter.field"
                   >
-              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-              <mat-option *ngFor="let column of filteredOptions | async ; trackBy: trackByField" [value]="column.field" [disabled]="disableField(column)">
-                {{ columnToLabel(column) }}
-              </mat-option>
+              <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let column of filteredOptions | async ; trackBy: trackByField" [value]="column.field" [disabled]="disableField(column)">
+                  {{ columnToLabel(column) }}
+                </mat-option>
              </mat-autocomplete>
           </mat-form-field>
 
@@ -125,18 +125,23 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
     AsyncPipe
   ],
 })
-export class FiltersDialogComponent<T extends object> implements OnInit {
+export class FiltersDialogComponent<T extends object> implements OnInit, AfterViewInit{
   #iconsService = inject(IconsService);
 
   filterForm = new FormControl('');
 
-  avalaibleFiltersFields = [...this.availableFiltersFields()]; 
   filteredOptions: Observable<FilterField<T>[]>;
 
   filters: Filter<T>[] = [];
   columnsLabels: Record<ColumnKey<T>, string> | null = null;
 
   constructor(public dialogRef: MatDialogRef<FiltersDialogComponent<T>>, @Inject(MAT_DIALOG_DATA) public data: FiltersDialogData<T>){}
+  ngAfterViewInit() {
+    this.filteredOptions =this.filterForm.valueChanges.pipe(
+      startWith(''), 
+      map( value => this._filter(value)),
+    );
+  }
 
   ngOnInit(): void {
     this.columnsLabels = this.data.columnsLabels;
@@ -145,17 +150,16 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
       this.addFilter();
     } else {
       // Avoid to mutate original data
+
       this.filters = this.data.filters.map(filter => ({ ...filter }));
     }
 
-    this.filteredOptions = this.filterForm.valueChanges.pipe(
-      startWith(''), 
-      map( value => this._filter(value)),
-    ); 
   }
 
-  private _filter(value: string | null ) : FilterField<T>[] {
-    return this.avalaibleFiltersFields.filter(option => option.field.toString().includes(value?.toLowerCase() as string));
+  private _filter(value: string | null ) {
+    const newValue = this.availableFiltersFields().filter((option) => option.field.toString().includes(value?.toLowerCase() as string));
+    newValue.map((value, index )=> this.onFieldChange(index, value.field));
+    return newValue;
   }
 
   getIcon(name: string): string {
@@ -184,7 +188,9 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
   }
 
   onFieldChange(index: number, name: FieldKey<T>): void {
+    if(!this.filters[index]) return; 
     this.filters[index].field = name;
+
   }
 
   onInputValueChange(index: number, event: FilterEvent): void {
