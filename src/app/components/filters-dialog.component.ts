@@ -1,5 +1,7 @@
-import { NgForOf, NgIf } from '@angular/common';
+import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
 import { Component, Inject, OnInit, inject } from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,11 +10,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Observable, map, startWith, switchMap } from 'rxjs';
 import { ColumnKey, FieldKey } from '@app/types/data';
 import { FiltersDialogData } from '@app/types/dialog';
 import { Filter, FilterEvent, FilterField, FilterFieldSelect, FilterInput, FilterInputDate, FilterInputSelect, FilterInputText, FilterInputType } from '@app/types/filters';
 import { IconsService } from '@services/icons.service';
 import { FiltersDialogInputComponent } from './filters-dialog-input.component';
+
+
+
 @Component({
   selector: 'app-filters-dialog',
   template: `
@@ -27,11 +33,19 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
           <span *ngIf="index > 0" i18n="Filter condition">And</span>
           <mat-form-field appearance="outline"  subscriptSizing="dynamic">
             <mat-label i18n="Label input">Column</mat-label>
-            <mat-select (valueChange)="onFieldChange(index, $event)" [value]="filter.field">
-              <mat-option *ngFor="let column of availableFiltersFields(); trackBy: trackByField" [value]="column.field" [disabled]="disableField(column)">
+            <input type="text"
+                  placeholder="Pick one"
+                  aria-label="Number"
+                  matInput
+                  [formControl]="filterForm"
+                  [matAutocomplete]="auto"
+                  [value]="filter.field"
+                  >
+              <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+              <mat-option *ngFor="let column of filteredOptions | async ; trackBy: trackByField" [value]="column.field" [disabled]="disableField(column)">
                 {{ columnToLabel(column) }}
               </mat-option>
-            </mat-select>
+             </mat-autocomplete>
           </mat-form-field>
 
           <span i18n>is</span>
@@ -105,10 +119,19 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
     MatIconModule,
     MatTooltipModule,
     MatMenuModule,
+    MatAutocompleteModule,
+    FormsModule,
+    ReactiveFormsModule,
+    AsyncPipe
   ],
 })
 export class FiltersDialogComponent<T extends object> implements OnInit {
   #iconsService = inject(IconsService);
+
+  filterForm = new FormControl('');
+
+  avalaibleFiltersFields = [...this.availableFiltersFields()]; 
+  filteredOptions: Observable<FilterField<T>[]>;
 
   filters: Filter<T>[] = [];
   columnsLabels: Record<ColumnKey<T>, string> | null = null;
@@ -124,6 +147,15 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
       // Avoid to mutate original data
       this.filters = this.data.filters.map(filter => ({ ...filter }));
     }
+
+    this.filteredOptions = this.filterForm.valueChanges.pipe(
+      startWith(''), 
+      map( value => this._filter(value)),
+    ); 
+  }
+
+  private _filter(value: string | null ) : FilterField<T>[] {
+    return this.avalaibleFiltersFields.filter(option => option.field.toString().includes(value?.toLowerCase() as string));
   }
 
   getIcon(name: string): string {
