@@ -1,7 +1,6 @@
 
-import { AsyncPipe, NgForOf, NgIf } from '@angular/common';
+import { NgForOf, NgIf } from '@angular/common';
 import { Component, Inject, OnInit, inject } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -34,7 +33,7 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
             <mat-label i18n="Label input">Column</mat-label>
             <input type="text" matInput (input)="filterValue(filter, $event)" [matAutocomplete]="auto" [value]="filter.field">
               <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onFieldChange(filter, $event)">
-              <mat-option *ngFor="let column of filterOption(filter.field?.toString() ?? ''); trackBy: trackByField" [value]="column" [disabled]="disableField(column)">
+              <mat-option *ngFor="let column of filterOption(filter); trackBy: trackByField" [value]="column" [disabled]="disableField(column)">
                 {{ columnToLabel(column) }}
               </mat-option>
              </mat-autocomplete>
@@ -101,9 +100,6 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
   `],
   standalone: true,
   imports: [
-    AsyncPipe,
-    FormsModule,
-    ReactiveFormsModule,
     MatAutocompleteModule,
     NgForOf,
     NgIf,
@@ -124,13 +120,12 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
   filters: Filter<T>[] = [];
   columnsLabels: Record<ColumnKey<T>, string> | null = null;
 
-  avalaiableFiltersFields: FilterField<T>[]; 
-
   constructor(public dialogRef: MatDialogRef<FiltersDialogComponent<T>>, @Inject(MAT_DIALOG_DATA) public data: FiltersDialogData<T>){}
 
   ngOnInit(): void {
     this.columnsLabels = this.data.columnsLabels;
     
+
     if (this.data.filters.length === 0) {
       this.addFilter();
     } else {
@@ -139,9 +134,14 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
     }
   }
 
-  filterOption(value: string) {
-    const filterValue = value.toLowerCase();
-    const options = [...this.availableFiltersFields()].map(option => option.field); 
+
+  stringifyFilterField(value: Filter<T>) : string {
+    return value.field?.toString() ?? ''; 
+  }
+
+  filterOption(value: Filter<T> ) : (keyof T)[] {
+    const filterValue = this.stringifyFilterField(value).toLowerCase(); 
+    const options = [...this.availableFiltersFields()].map(option => option.field);
 
     return options.filter(option => option.toString().toLowerCase().includes(filterValue));
   }
@@ -152,9 +152,8 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
 
   filterValue( filter: Filter<T>, event: Event) {
     const target = event.target as HTMLInputElement;
-    const value = target.value;   
-    filter.field = value as keyof T;
-
+    const value = target.value;
+    filter.field = value as keyof T;  // not a permanent solution
   }
 
   /**
@@ -215,7 +214,7 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
 
   disableField(field: keyof T): boolean {
     const usedFields = this.filters.map(filter => filter.field);
-    return usedFields.includes(field);
+    return usedFields.includes(field); 
   }
 
   findType(field: FieldKey<T> | null): FilterInputType {
