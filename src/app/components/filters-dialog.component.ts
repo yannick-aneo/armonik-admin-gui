@@ -1,6 +1,6 @@
 
 import { NgForOf, NgIf } from '@angular/common';
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit, ViewChild, inject } from '@angular/core';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -31,13 +31,13 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
           <span *ngIf="index > 0" i18n="Filter condition">And</span>
           <mat-form-field appearance="outline"  subscriptSizing="dynamic">
             <mat-label i18n="Label input">Column</mat-label>
-            <input type="text" matInput (input)="filterValue(filter, $event)" [matAutocomplete]="auto" [value]="filter.field">
-              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onFieldChange(filter, $event)">
-              <mat-option *ngFor="let column of filterOption(filter); trackBy: trackByField" [value]="column" [disabled]="disableField(column)">
+            <input #input type="text" matInput (input)="filterValue(filter)" (focus)="filterValue(filter)" [matAutocomplete]="auto" [value]="filter.field">
+              <mat-autocomplete requireSelection  #auto="matAutocomplete" (optionSelected)="onFieldChange(filter, $event)">
+              <mat-option *ngFor="let column of filteredOptionsFields; trackBy: trackByField" [value]="column" [disabled]="disableField(column)">
                 {{ columnToLabel(column) }}
               </mat-option>
              </mat-autocomplete>
-        
+         
           </mat-form-field>
 
           <span i18n>is</span>
@@ -115,12 +115,19 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
   ],
 })
 export class FiltersDialogComponent<T extends object> implements OnInit {
+
+  @ViewChild('input') input: ElementRef<HTMLInputElement>;
   #iconsService = inject(IconsService);
 
   filters: Filter<T>[] = [];
   columnsLabels: Record<ColumnKey<T>, string> | null = null;
 
-  constructor(public dialogRef: MatDialogRef<FiltersDialogComponent<T>>, @Inject(MAT_DIALOG_DATA) public data: FiltersDialogData<T>){}
+  optionsFields = this.availableFiltersFields().map(option => option.field);
+  filteredOptionsFields: (keyof T)[] = [];
+
+  constructor(public dialogRef: MatDialogRef<FiltersDialogComponent<T>>, @Inject(MAT_DIALOG_DATA) public data: FiltersDialogData<T>){
+    this.filteredOptionsFields =  this.optionsFields.slice();
+  }
 
   ngOnInit(): void {
     this.columnsLabels = this.data.columnsLabels;
@@ -139,21 +146,23 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
     return value.field?.toString() ?? ''; 
   }
 
-  filterOption(value: Filter<T> ) : (keyof T)[] {
-    const filterValue = this.stringifyFilterField(value).toLowerCase(); 
-    const options = [...this.availableFiltersFields()].map(option => option.field);
+  // filterOption(value: Filter<T> ) : (keyof T)[] {
+  //   const filterValue = this.stringifyFilterField(value).toLowerCase(); 
+  //   const options = [...this.availableFiltersFields()].map(option => option.field);
 
-    return options.filter(option => option.toString().toLowerCase().includes(filterValue));
-  }
+  //   return options.filter(option => option.toString().toLowerCase().includes(filterValue));
+  // }
 
   getIcon(name: string): string {
     return this.#iconsService.getIcon(name);
   }
 
-  filterValue( filter: Filter<T>, event: Event) {
-    const target = event.target as HTMLInputElement;
-    const value = target.value;
-    filter.field = value as keyof T;  // not a permanent solution
+  filterValue( filter: Filter<T> ) {
+    const selectedValue = this.input.nativeElement.value.toLowerCase();
+    filter.field = this.filteredOptionsFields.find( element => element === selectedValue as keyof T)  || null;
+    this.filteredOptionsFields = this.optionsFields.filter(option => option.toString().toLowerCase().includes(selectedValue)); 
+    
+
   }
 
   /**
