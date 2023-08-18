@@ -1,5 +1,6 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatDatepickerInputEvent, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,12 +12,13 @@ import { DateType, FilterEvent, FilterInput, FilterInputType } from '@app/types/
 
 
 
+
 @Component({
   selector: 'app-filters-dialog-input',
   template: `
 <mat-form-field appearance="outline" subscriptSizing="dynamic" *ngIf="input.type === 'text'">
   <mat-label i18n="Input label">Value</mat-label>
-  <input matInput [type]="getInputType()" placeholder="Value" [value]="input.value" (change)="onTextChange($event)">
+  <input matInput [type]="getInputType()" placeholder="Value" [value]="input.value" [(ngModel)]="input.value" (change)="onTextChange($event)" required>
 </mat-form-field>
 
 <!-- TODO: allow user to use <, >, =, != -->
@@ -61,6 +63,7 @@ mat-form-field {
   imports: [
     NgIf,
     NgFor,
+    FormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,

@@ -1,6 +1,7 @@
 
 import { NgForOf, NgIf } from '@angular/common';
 import { Component, Inject, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -29,9 +30,18 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
         <div class="filter" *ngFor="let filter of filters; let index = index; trackBy:trackByFilter">
           <span *ngIf="index === 0" i18n="Filter condition">Where</span>
           <span *ngIf="index > 0" i18n="Filter condition">And</span>
-          <mat-form-field appearance="outline"  subscriptSizing="dynamic">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-label i18n="Label input">Column</mat-label>
-            <input type="text" matInput (input)="filterValue(filter, $event)" [matAutocomplete]="auto" [value]="filter.field">
+            <input type="text" 
+                  matInput 
+                  (input)="filterValue(filter, $event)" 
+                  [matAutocomplete]="auto" 
+                  [value]="filter.field" 
+                  [(ngModel)]="filter.field" 
+                  required>
+            <mat-error *ngIf="!filter.field">
+               A value is <strong>required</strong>
+            </mat-error>
               <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onFieldChange(filter, $event)">
               <mat-option *ngFor="let column of filterOption(filter); trackBy: trackByField" [value]="column" [disabled]="disableField(column)">
                 {{ columnToLabel(column) }}
@@ -42,7 +52,7 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
 
           <span i18n>is</span>
 
-          <app-filters-dialog-input [input]="findInput(filter)" (valueChange)="onInputValueChange(index, $event)"></app-filters-dialog-input>
+          <app-filters-dialog-input [input]="findInput(filter)" (valueChange)="onInputValueChange(index, $event)" ></app-filters-dialog-input>
 
           <button mat-icon-button aria-label="More options" mat-tooltip="More options" [matMenuTriggerFor]="menu">
             <mat-icon aria-hidden="true" [fontIcon]="getIcon('more')"></mat-icon>
@@ -103,6 +113,7 @@ import { FiltersDialogInputComponent } from './filters-dialog-input.component';
     MatAutocompleteModule,
     NgForOf,
     NgIf,
+    FormsModule,
     FiltersDialogInputComponent,
     MatDialogModule,
     MatButtonModule,
