@@ -164,7 +164,7 @@ export class FiltersDialogComponent<T extends object> implements OnInit {
   filterValue( filter: Filter<T>, event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value;
-    filter.field = value as keyof T;  // not a permanent solution
+    filter.field = value as keyof T; 
   }
 
   /**
