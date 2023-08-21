@@ -1,7 +1,8 @@
 import { TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
+import { Line } from '@app/dashboard/types';
 import { TaskOptions } from '@app/tasks/types';
 import { ColumnKey } from './data';
-import { Filter, FilterField } from './filters';
+import { FiltersOr } from './filters';
 
 export interface ColumnsModifyDialogData<T extends object, O extends object> {
   currentColumns: ColumnKey<T, O>[]
@@ -11,17 +12,15 @@ export interface ColumnsModifyDialogData<T extends object, O extends object> {
 
 export type ColumnsModifyDialogResult<T extends object, O extends object> = ColumnKey<T, O>[];
 
-export interface FiltersDialogData<T extends object> {
-  filters: Filter<T>[]
-  availableFiltersFields: FilterField<T>[]
-  columnsLabels: Record<ColumnKey<T>, string>
+export interface FiltersDialogData<T extends number, U extends number | null = null> {
+  filtersOr: FiltersOr<T, U>
 }
+
+export type FiltersDialogResult<T extends number, U extends number | null = null> = FiltersOr<T, U>;
 
 export interface AutoRefreshDialogData {
   value: number
 }
-
-// TODO: type this dialog with result
 
 export type TaskStatusColored = {
   status: TaskStatus;
@@ -31,6 +30,9 @@ export type TaskStatusColored = {
 export interface ViewTasksByStatusDialogData {
   statusesCounts: TaskStatusColored[]
 }
+
+export type ViewTasksByStatusDialogResult = Record<string, never>;
+
 export interface ViewObjectDialogData {
   title: string;
   object: TaskOptions;
@@ -57,4 +59,20 @@ export type EditNameLineData = {
 
 export type EditNameLineResult = {
   name: string;
+};
+
+export type ReorganizeLinesDialogData = {
+  lines: Line[];
+};
+
+export type ReorganizeLinesDialogResult = {
+  lines: Line[];
+};
+
+export type SplitLinesDialogData = {
+  columns: number;
+};
+
+export type SplitLinesDialogResult = {
+  columns: number;
 };

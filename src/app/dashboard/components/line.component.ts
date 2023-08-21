@@ -6,12 +6,15 @@ import {  MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Observable, Subject, Subscription, merge, startWith, switchMap, tap } from 'rxjs';
+import { TasksFiltersService } from '@app/tasks/services/tasks-filters.service';
 import { TasksGrpcService } from '@app/tasks/services/tasks-grpc.service';
 import { TasksIndexService } from '@app/tasks/services/tasks-index.service';
 import { TasksStatusesService } from '@app/tasks/services/tasks-status.service';
 import { StatusCount, TaskSummaryColumnKey } from '@app/tasks/types';
+import { DATA_FILTERS_SERVICE } from '@app/tokens/filters.token';
 import { EditNameLineData, EditNameLineResult } from '@app/types/dialog';
 import { Page } from '@app/types/pages';
+import { FiltersToolbarComponent } from '@components/filters/filters-toolbar.component';
 import { AutoRefreshService } from '@services/auto-refresh.service';
 import { IconsService } from '@services/icons.service';
 import { QueryParamsService } from '@services/query-params.service';
@@ -24,13 +27,10 @@ import { StatusesGroupCardComponent } from './statuses-group-card.component';
 import { ActionsToolbarGroupComponent } from '../../components/actions-toolbar-group.component';
 import { ActionsToolbarComponent } from '../../components/actions-toolbar.component';
 import { AutoRefreshButtonComponent } from '../../components/auto-refresh-button.component';
-import { FiltersToolbarComponent } from '../../components/filters-toolbar.component';
 import { PageSectionHeaderComponent } from '../../components/page-section-header.component';
 import { PageSectionComponent } from '../../components/page-section.component';
 import { RefreshButtonComponent } from '../../components/refresh-button.component';
 import { SpinnerComponent } from '../../components/spinner.component';
-import { DashboardIndexService } from '../services/dashboard-index.service';
-import { DashboardStorageService } from '../services/dashboard-storage.service';
 import { Line, ManageGroupsDialogData, ManageGroupsDialogResult } from '../types';
 
 @Component({
@@ -82,7 +82,7 @@ import { Line, ManageGroupsDialogData, ManageGroupsDialogResult } from '../types
   </mat-toolbar-row>
 
   <mat-toolbar-row>
-    <app-filters-toolbar [filters]="line.filters" [filtersFields]="availableFiltersFields" [columnsLabels]="columnsLabels()" (filtersChange)="onFiltersChange($event)"></app-filters-toolbar>
+    <app-filters-toolbar [filters]="line.filters" (filtersChange)="onFiltersChange($event)"></app-filters-toolbar>
   </mat-toolbar-row>
 </mat-toolbar>
 
@@ -119,6 +119,10 @@ app-actions-toolbar {
     UtilsService,
     TasksIndexService,
     TasksGrpcService,
+    {
+      provide: DATA_FILTERS_SERVICE,
+      useClass: TasksFiltersService
+    },
   ],
   imports: [
     PageSectionComponent,
@@ -139,20 +143,19 @@ app-actions-toolbar {
   ]
 })
 export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
+  readonly #dialog = inject(MatDialog);
+  readonly #autoRefreshService = inject(AutoRefreshService);
+  readonly #iconsService = inject(IconsService);
+  readonly #taskGrpcService = inject(TasksGrpcService);
+  readonly #tasksIndexService = inject(TasksIndexService);
+
   @Input({ required: true }) line: Line;
   @Output() lineChange: EventEmitter<void> = new EventEmitter<void>();
   @Output() lineDelete: EventEmitter<Line> = new EventEmitter<Line>();
 
-  #dialog = inject(MatDialog);
-  #autoRefreshService = inject(AutoRefreshService);
-  #iconsService = inject(IconsService);
-  #taskGrpcService = inject(TasksGrpcService);
-  #tasksIndexService = inject(TasksIndexService);
-
   total: number;
   loadTasksStatus = false;
   data: StatusCount[] = [];
-  availableFiltersFields: any[] = [];
 
   refresh: Subject<void> = new Subject<void>();
   stopInterval: Subject<void> = new Subject<void>();
@@ -162,15 +165,15 @@ export class LineComponent implements OnInit, AfterViewInit,OnDestroy {
 
   ngOnInit(): void {
     this.loadTasksStatus = true;
-    this.availableFiltersFields = this.#tasksIndexService.availableFiltersFields;
   }
 
   ngAfterViewInit() {
     const mergeSubscription = merge(this.refresh, this.interval$).pipe(
       startWith(0),
       tap(() => (this.loadTasksStatus = true)),
-      switchMap(() => this.#taskGrpcService.countByStatu$()),
+      switchMap(() => this.#taskGrpcService.countByStatu$(this.line.filters)),
     ).subscribe((data) => {
+
       if (!data.status) {
         return;
       }

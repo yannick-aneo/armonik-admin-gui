@@ -1,11 +1,11 @@
 import {TaskStatus } from '@aneoconsultingfr/armonik.api.angular';
+import { TaskSummaryFiltersOr } from '@app/tasks/types';
 
 export type Line = {
   name: string,
   interval: number,
   hideGroupsHeader: boolean,
-  // TODO: waiting for full filters before adding correct type.
-  filters: [],
+  filters: TaskSummaryFiltersOr,
   taskStatusesGroups: TasksStatusesGroup[],
 };
 
