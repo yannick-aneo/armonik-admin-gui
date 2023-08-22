@@ -1,11 +1,12 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
-import { Component, Inject, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { ReorganizeLinesDialogData, ReorganizeLinesDialogResult } from '@app/types/dialog';
+import { EditNameLineData, EditNameLineResult, ReorganizeLinesDialogData, ReorganizeLinesDialogResult } from '@app/types/dialog';
 import { IconsService } from '@services/icons.service';
+import { EditNameLineDialogComponent } from './edit-name-line-dialog.component';
 import { Line } from '../types';
 
 @Component({
@@ -20,6 +21,18 @@ import { Line } from '../types';
     <div class="line" *ngFor="let line of lines" cdkDrag>
       <mat-icon mat-icon aria-hidden="true" i18n-aria-label aria-label="Drag status" [fontIcon]="getIcon('drag')"></mat-icon>
       <span class="line-name">{{ line.name }}</span>
+      <button mat-menu-item (click)="onEditNameLine(line.name)">
+            <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
+              <span i18n>
+                Edit name line
+              </span>
+          </button>
+          <button mat-menu-item (click)="onDeleteLine(line)">
+              <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
+              <span i18n>
+                Delete line
+              </span>
+      </button>
       <!-- TODO: Add a button to rename the line (use same dialog as the one used for a line "Edit Name Line") -->
       <!-- TODO: Add a button to remove the line -->
     </div>
@@ -72,12 +85,19 @@ import { Line } from '../types';
     MatIconModule,
     MatButtonModule,
     DragDropModule,
+    MatDialogModule,
   ]
 })
 export class ReorganizeLinesDialogComponent implements OnInit {
+
+  @Input({ required: true }) line: Line;
+  @Output() lineChange: EventEmitter<void> = new EventEmitter<void>();
+  @Output() lineDelete: EventEmitter<Line> = new EventEmitter<Line>();
+
+
   readonly #dialogRef = inject(MatDialogRef<ReorganizeLinesDialogData, ReorganizeLinesDialogResult>);
   readonly #iconsService = inject(IconsService);
-
+  readonly #dialog = inject(MatDialog);
   lines: Line[] = [];
 
   constructor(
@@ -100,6 +120,24 @@ export class ReorganizeLinesDialogComponent implements OnInit {
     moveItemInArray(this.lines, event.previousIndex, event.currentIndex);
   }
 
+  onDeleteLine(value: Line) {
+    console.log(`yoyu ${value.name}`);
+  }
+  
+  onEditNameLine(value: string) {
+    const dialogRef: MatDialogRef<EditNameLineDialogComponent, EditNameLineResult> = this.#dialog.open<EditNameLineDialogComponent, EditNameLineData, EditNameLineResult>(EditNameLineDialogComponent, {
+      data: {
+        name: value
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return; 
+      console.log(this.lines);
+      this.lines.map( line => line); 
+    });
+
+  }
   trackByLine(index: number, line: Line): string {
     return line.name + index;
   }
