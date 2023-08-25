@@ -291,7 +291,7 @@ export class IndexComponent implements OnInit {
   onSaveChange() {
     this.#dashboardIndexService.saveLines(this.lines);
   }
-
+  
   trackByLine(index: number, _: Line) {
     return index;
   }
