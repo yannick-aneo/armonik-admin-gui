@@ -22,18 +22,14 @@ import { Line } from '../types';
     <div class="line" *ngFor="let line of lines;let index = index"  cdkDrag>
       <mat-icon mat-icon aria-hidden="true" i18n-aria-label aria-label="Drag status" [fontIcon]="getIcon('drag')"></mat-icon>
       <span class="line-name">{{ line.name }}</span>
-          <button mat-flat-button (click)="onEditNameLine(line,index)">
-            <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
-              <span i18n>
-                Edit name line
-              </span>
-          </button>
-          <button mat-flat-button (click)="onDeleteLine(line)">
-              <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
-              <span i18n>
-                Delete line
-              </span>
-           </button>
+      <button mat-flat-button (click)="onEditNameLine(line,index)">
+        <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
+        <span i18n>Edit name line</span>
+      </button>
+      <button mat-flat-button (click)="onDeleteLine(line)">
+        <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
+        <span i18n>Delete line</span>
+      </button>
     </div>
   </div>
 </mat-dialog-content>
