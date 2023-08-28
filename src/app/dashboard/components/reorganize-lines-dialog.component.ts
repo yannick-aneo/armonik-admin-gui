@@ -4,6 +4,7 @@ import { Component, EventEmitter, Inject, OnInit, Output, inject } from '@angula
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { EditNameLineData, EditNameLineResult, ReorganizeLinesDialogData, ReorganizeLinesDialogResult } from '@app/types/dialog';
 import { IconsService } from '@services/icons.service';
 import { EditNameLineDialogComponent } from './edit-name-line-dialog.component';
@@ -21,18 +22,18 @@ import { Line } from '../types';
     <div class="line" *ngFor="let line of lines;let index = index"  cdkDrag>
       <mat-icon mat-icon aria-hidden="true" i18n-aria-label aria-label="Drag status" [fontIcon]="getIcon('drag')"></mat-icon>
       <span class="line-name">{{ line.name }}</span>
-      <button mat-menu-item (click)="onEditNameLine(line,index)">
+          <button mat-flat-button (click)="onEditNameLine(line,index)">
             <mat-icon aria-hidden="true"  [fontIcon]="getIcon('edit')"></mat-icon>
               <span i18n>
                 Edit name line
               </span>
           </button>
-          <button mat-menu-item (click)="onDeleteLine(line)">
+          <button mat-flat-button (click)="onDeleteLine(line)">
               <mat-icon aria-hidden="true" [fontIcon]="getIcon('delete')"></mat-icon>
               <span i18n>
                 Delete line
               </span>
-      </button>
+           </button>
     </div>
   </div>
 </mat-dialog-content>
@@ -84,6 +85,7 @@ import { Line } from '../types';
     MatButtonModule,
     DragDropModule,
     MatDialogModule,
+    MatMenuModule
   ]
 })
 export class ReorganizeLinesDialogComponent implements OnInit {
