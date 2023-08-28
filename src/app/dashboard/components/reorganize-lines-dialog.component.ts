@@ -117,21 +117,24 @@ export class ReorganizeLinesDialogComponent implements OnInit {
     moveItemInArray(this.lines, event.previousIndex, event.currentIndex);
   }
 
-  onDeleteLine(value: Line) {
-    console.log(` ${value.name}`);
+  onDeleteLine( line: Line) {
+    const index = this.lines.indexOf(line);
+    if (index > -1) {
+      this.lines.splice(index, 1);
+    }
   }
   
-  onEditNameLine(value: Line, index: number) {
+  onEditNameLine(line: Line, index: number) {
     const dialogRef: MatDialogRef<EditNameLineDialogComponent, EditNameLineResult> = this.#dialog.open<EditNameLineDialogComponent, EditNameLineData, EditNameLineResult>(EditNameLineDialogComponent, {
       data: {
-        name: value.name
+        name: line.name
       }
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return; 
       const selectedLine = this.lines[index];
-      const changeSelectedNameLine = (line: Line, newName: string) => {
+      const changeSelectedNameLine = (line: Line, newName: string): void => {
         if(line.name === newName) {
           line.name = result.name;
         }
